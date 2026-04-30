@@ -1,0 +1,15 @@
+{
+  "OllamaUrl": "http://localhost:11434",
+  "OllamaModel": "llama3.1",
+  "PiperPath": "piper",
+  "PiperModelPath": "models/voice.onnx",
+  "FFmpegPath": "ffmpeg",
+  "DefaultOutputPath": "output",
+  "DefaultChannelDNA": {
+    "Niche": "Educational",
+    "HostPersona": "Friendly expert",
+    "ToneGuidelines": "Conversational, clear, engaging",
+    "TargetAudience": "General audience",
+    "ContentStyle": "Informative with storytelling"
+  }
+}

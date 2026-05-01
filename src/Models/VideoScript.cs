@@ -22,4 +22,9 @@ public class ScriptSegment
     public int StartTime { get; set; } // in seconds
     public int Duration { get; set; } // in seconds
     public List<string> VisualCues { get; set; } = new();
+    
+    /// <summary>
+    /// Primary visual cue for this segment (for AI video generation)
+    /// </summary>
+    public string VisualCue => VisualCues.FirstOrDefault() ?? Text;
 }

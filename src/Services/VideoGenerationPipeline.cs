@@ -114,7 +114,7 @@ public class VideoGenerationPipeline
             var prompt = new VideoPrompt
             {
                 Description = segment.VisualCue,
-                Duration = (int)Math.Ceiling(segment.Duration),
+                Duration = (int)Math.Ceiling((double)segment.Duration),
                 AspectRatio = _aiVideoConfig.DefaultSettings.AspectRatio,
                 Style = _aiVideoConfig.DefaultSettings.Style,
                 MotionIntensity = _aiVideoConfig.DefaultSettings.MotionIntensity,

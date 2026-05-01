@@ -165,7 +165,7 @@ public class AnimateDiffVideoService : IAIVideoGeneratorService, IDisposable
                 inputs = new
                 {
                     text = prompt.Description,
-                    clip = new[] { "1", 1 }
+                    clip = new object[] { "1", 1 }
                 },
                 class_type = "CLIPTextEncode"
             },
@@ -174,7 +174,7 @@ public class AnimateDiffVideoService : IAIVideoGeneratorService, IDisposable
                 inputs = new
                 {
                     text = prompt.NegativePrompt ?? "blurry, low quality, distorted",
-                    clip = new[] { "1", 1 }
+                    clip = new object[] { "1", 1 }
                 },
                 class_type = "CLIPTextEncode"
             },
@@ -188,10 +188,10 @@ public class AnimateDiffVideoService : IAIVideoGeneratorService, IDisposable
                     sampler_name = _config.Sampler,
                     scheduler = "normal",
                     denoise = 1.0,
-                    model = new[] { "2", 0 },
-                    positive = new[] { "3", 0 },
-                    negative = new[] { "4", 0 },
-                    latent_image = new[] { "6", 0 }
+                    model = new object[] { "2", 0 },
+                    positive = new object[] { "3", 0 },
+                    negative = new object[] { "4", 0 },
+                    latent_image = new object[] { "6", 0 }
                 },
                 class_type = "KSampler"
             },
@@ -209,8 +209,8 @@ public class AnimateDiffVideoService : IAIVideoGeneratorService, IDisposable
             {
                 inputs = new
                 {
-                    samples = new[] { "5", 0 },
-                    vae = new[] { "1", 2 }
+                    samples = new object[] { "5", 0 },
+                    vae = new object[] { "1", 2 }
                 },
                 class_type = "VAEDecode"
             },
@@ -222,7 +222,7 @@ public class AnimateDiffVideoService : IAIVideoGeneratorService, IDisposable
                     loop_count = 0,
                     filename_prefix = "AnimateDiff",
                     format = "video/h264-mp4",
-                    images = new[] { "7", 0 }
+                    images = new object[] { "7", 0 }
                 },
                 class_type = "VHS_VideoCombine"
             }

@@ -12,6 +12,8 @@ public class VideoRequest
     public ChannelDNA ChannelDNA { get; set; } = new();
     public int TargetDurationSeconds { get; set; } = 60;
     public string OutputPath { get; set; } = "output";
+    public List<string>? VisualImagePaths { get; set; } // For user-provided images
+    public VideoOutputSettings OutputSettings { get; set; } = new();
 }
 
 /// <summary>

@@ -13,6 +13,11 @@ public class AppConfig
     public string DefaultOutputPath { get; set; } = "output";
     
     /// <summary>
+    /// Enable dark mode theme
+    /// </summary>
+    public bool DarkMode { get; set; } = false;
+    
+    /// <summary>
     /// Enable GPU acceleration for video encoding (requires compatible GPU and FFmpeg build)
     /// </summary>
     public bool UseGpuAcceleration { get; set; } = false;

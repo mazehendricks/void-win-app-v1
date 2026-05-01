@@ -476,7 +476,14 @@ public partial class MainForm : Form
         {
             var status = await _pipeline.CheckServicesAsync();
 
-            txtSystemStatus.AppendText("=== SYSTEM STATUS CHECK ===\r\n\r\n");
+            txtSystemStatus.AppendText("╔════════════════════════════════════════════════════════════╗\r\n");
+            txtSystemStatus.AppendText("║           VOID VIDEO GENERATOR - SYSTEM STATUS            ║\r\n");
+            txtSystemStatus.AppendText("╚════════════════════════════════════════════════════════════╝\r\n\r\n");
+            txtSystemStatus.AppendText($"Timestamp: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\r\n");
+            txtSystemStatus.AppendText($"OS: {Environment.OSVersion}\r\n");
+            txtSystemStatus.AppendText($".NET Version: {Environment.Version}\r\n\r\n");
+
+            txtSystemStatus.AppendText("=== CORE SERVICES STATUS ===\r\n\r\n");
 
             foreach (var service in status)
             {
@@ -485,60 +492,176 @@ public partial class MainForm : Form
                 txtSystemStatus.AppendText($"{statusIcon} {service.Key}: {statusText}\r\n");
             }
 
-            // Get detailed Ollama diagnostics
+            // Detailed AI Provider diagnostics
+            txtSystemStatus.AppendText("\r\n=== AI SCRIPT GENERATOR ===\r\n\r\n");
+            txtSystemStatus.AppendText($"Provider: {_config.AiProvider.ToUpper()}\r\n");
+            
             if (_scriptGenerator != null)
             {
-                txtSystemStatus.AppendText("\r\n=== SCRIPT GENERATOR ===\r\n\r\n");
-                txtSystemStatus.AppendText($"Provider: {_config.AiProvider}\r\n");
-                txtSystemStatus.AppendText($"Status: {(await _scriptGenerator.IsAvailableAsync() ? "✓ Available" : "✗ Not Available")}\r\n");
+                var isAvailable = await _scriptGenerator.IsAvailableAsync();
+                txtSystemStatus.AppendText($"Status: {(isAvailable ? "✓ Available" : "✗ Not Available")}\r\n");
+                
+                switch (_config.AiProvider.ToLower())
+                {
+                    case "ollama":
+                        txtSystemStatus.AppendText($"URL: {_config.OllamaUrl}\r\n");
+                        txtSystemStatus.AppendText($"Model: {_config.OllamaModel}\r\n");
+                        if (!isAvailable)
+                        {
+                            txtSystemStatus.AppendText("\r\n⚠ Troubleshooting:\r\n");
+                            txtSystemStatus.AppendText("  • Check if Ollama is running: ollama serve\r\n");
+                            txtSystemStatus.AppendText("  • Verify model is installed: ollama list\r\n");
+                            txtSystemStatus.AppendText("  • Test connection: curl http://localhost:11434/api/tags\r\n");
+                        }
+                        break;
+                    case "openai":
+                        txtSystemStatus.AppendText($"Model: {_config.OpenAiModel}\r\n");
+                        txtSystemStatus.AppendText($"API Key: {(string.IsNullOrEmpty(_config.OpenAiApiKey) ? "✗ Not Set" : "✓ Configured")}\r\n");
+                        if (!isAvailable)
+                        {
+                            txtSystemStatus.AppendText("\r\n⚠ Troubleshooting:\r\n");
+                            txtSystemStatus.AppendText("  • Verify API key is correct\r\n");
+                            txtSystemStatus.AppendText("  • Check internet connection\r\n");
+                            txtSystemStatus.AppendText("  • Verify OpenAI service status\r\n");
+                        }
+                        break;
+                    case "anthropic":
+                    case "claude":
+                        txtSystemStatus.AppendText($"Model: {_config.AnthropicModel}\r\n");
+                        txtSystemStatus.AppendText($"API Key: {(string.IsNullOrEmpty(_config.AnthropicApiKey) ? "✗ Not Set" : "✓ Configured")}\r\n");
+                        if (!isAvailable)
+                        {
+                            txtSystemStatus.AppendText("\r\n⚠ Troubleshooting:\r\n");
+                            txtSystemStatus.AppendText("  • Verify API key is correct\r\n");
+                            txtSystemStatus.AppendText("  • Check internet connection\r\n");
+                            txtSystemStatus.AppendText("  • Verify Anthropic service status\r\n");
+                        }
+                        break;
+                    case "gemini":
+                    case "google":
+                        txtSystemStatus.AppendText($"Model: {_config.GeminiModel}\r\n");
+                        txtSystemStatus.AppendText($"API Key: {(string.IsNullOrEmpty(_config.GeminiApiKey) ? "✗ Not Set" : "✓ Configured")}\r\n");
+                        if (!isAvailable)
+                        {
+                            txtSystemStatus.AppendText("\r\n⚠ Troubleshooting:\r\n");
+                            txtSystemStatus.AppendText("  • Verify API key is correct\r\n");
+                            txtSystemStatus.AppendText("  • Check internet connection\r\n");
+                            txtSystemStatus.AppendText("  • Verify Google AI service status\r\n");
+                        }
+                        break;
+                }
             }
 
-            txtSystemStatus.AppendText("\r\n=== CONFIGURATION ===\r\n\r\n");
-            txtSystemStatus.AppendText($"Ollama URL: {_config.OllamaUrl}\r\n");
-            txtSystemStatus.AppendText($"Ollama Model: {_config.OllamaModel}\r\n");
-            txtSystemStatus.AppendText($"Piper Path: {_config.PiperPath}\r\n");
-            txtSystemStatus.AppendText($"Piper Model: {_config.PiperModelPath}\r\n");
-            txtSystemStatus.AppendText($"FFmpeg Path: {_config.FFmpegPath}\r\n");
-
-            txtSystemStatus.AppendText("\r\n=== INSTALLATION NOTES ===\r\n\r\n");
+            // Voice Generator diagnostics
+            txtSystemStatus.AppendText("\r\n=== VOICE GENERATOR (TTS) ===\r\n\r\n");
+            txtSystemStatus.AppendText($"Engine: Piper TTS\r\n");
+            txtSystemStatus.AppendText($"Executable: {_config.PiperPath}\r\n");
+            txtSystemStatus.AppendText($"Model: {_config.PiperModelPath}\r\n");
+            txtSystemStatus.AppendText($"Executable Exists: {(File.Exists(_config.PiperPath) ? "✓ Yes" : "✗ No")}\r\n");
+            txtSystemStatus.AppendText($"Model Exists: {(File.Exists(_config.PiperModelPath) ? "✓ Yes" : "✗ No")}\r\n");
             
-            if (!status["Ollama (LLM)"])
-            {
-                txtSystemStatus.AppendText("⚠ Ollama not detected:\r\n");
-                txtSystemStatus.AppendText("  1. Download from: https://ollama.com\r\n");
-                txtSystemStatus.AppendText("  2. Install and run: ollama serve\r\n");
-                txtSystemStatus.AppendText("  3. Pull a model: ollama pull llama3.1\r\n\r\n");
-            }
-
             if (!status["Piper (TTS)"])
             {
-                txtSystemStatus.AppendText("⚠ Piper not detected:\r\n");
-                txtSystemStatus.AppendText("  1. Download from: https://github.com/rhasspy/piper\r\n");
-                txtSystemStatus.AppendText("  2. Download a voice model (.onnx file)\r\n");
-                txtSystemStatus.AppendText("  3. Update paths in Settings tab\r\n\r\n");
+                txtSystemStatus.AppendText("\r\n⚠ Troubleshooting:\r\n");
+                txtSystemStatus.AppendText("  • Run install-piper.bat (Windows) or install-piper.sh (Linux/Mac)\r\n");
+                txtSystemStatus.AppendText("  • Download from: https://github.com/rhasspy/piper/releases\r\n");
+                txtSystemStatus.AppendText("  • Download voice model (.onnx + .json) from Piper voices repo\r\n");
+                txtSystemStatus.AppendText("  • Update paths in Settings tab\r\n");
             }
 
+            // Video Assembly diagnostics
+            txtSystemStatus.AppendText("\r\n=== VIDEO ASSEMBLY ===\r\n\r\n");
+            txtSystemStatus.AppendText($"Engine: FFmpeg\r\n");
+            txtSystemStatus.AppendText($"Path: {_config.FFmpegPath}\r\n");
+            txtSystemStatus.AppendText($"GPU Acceleration: {(_config.UseGpuAcceleration ? "✓ Enabled" : "✗ Disabled")}\r\n");
+            if (_config.UseGpuAcceleration)
+            {
+                txtSystemStatus.AppendText($"GPU Encoder: {_config.GpuEncoder}\r\n");
+            }
+            txtSystemStatus.AppendText($"Resolution: {_config.VideoSettings.Resolution}\r\n");
+            txtSystemStatus.AppendText($"Frame Rate: {_config.VideoSettings.FrameRate} fps\r\n");
+            txtSystemStatus.AppendText($"Quality: {_config.VideoSettings.QualityPreset}\r\n");
+            txtSystemStatus.AppendText($"Ken Burns Effect: {(_config.VideoSettings.EnableKenBurnsEffect ? "✓ Enabled" : "✗ Disabled")}\r\n");
+            txtSystemStatus.AppendText($"Crossfade Transitions: {(_config.VideoSettings.EnableCrossfadeTransitions ? "✓ Enabled" : "✗ Disabled")}\r\n");
+            
             if (!status["FFmpeg"])
             {
-                txtSystemStatus.AppendText("⚠ FFmpeg not detected:\r\n");
-                txtSystemStatus.AppendText("  1. Download from: https://ffmpeg.org/download.html\r\n");
-                txtSystemStatus.AppendText("  2. Add to system PATH or specify full path in Settings\r\n\r\n");
+                txtSystemStatus.AppendText("\r\n⚠ Troubleshooting:\r\n");
+                txtSystemStatus.AppendText("  • Download from: https://ffmpeg.org/download.html\r\n");
+                txtSystemStatus.AppendText("  • Add to system PATH or specify full path in Settings\r\n");
+                txtSystemStatus.AppendText("  • Test: ffmpeg -version\r\n");
             }
 
-            var allAvailable = status.Values.All(v => v);
-            if (allAvailable)
+            // Whisper diagnostics
+            txtSystemStatus.AppendText("\r\n=== CAPTION GENERATOR (WHISPER) ===\r\n\r\n");
+            txtSystemStatus.AppendText($"Mode: {(_config.UseWhisperApi ? "OpenAI API" : "Local Whisper")}\r\n");
+            if (_config.UseWhisperApi)
             {
-                txtSystemStatus.AppendText("\r\n✓ All systems ready! You can start generating videos.\r\n");
+                txtSystemStatus.AppendText($"API Key: {(string.IsNullOrEmpty(_config.OpenAiApiKey) ? "✗ Not Set" : "✓ Configured")}\r\n");
             }
             else
             {
-                txtSystemStatus.AppendText("\r\n⚠ Some services are not available. Please install missing components.\r\n");
-                txtSystemStatus.AppendText("See TROUBLESHOOTING.md for detailed help.\r\n");
+                txtSystemStatus.AppendText($"Path: {_config.WhisperPath}\r\n");
+                txtSystemStatus.AppendText($"Model: {_config.WhisperModel}\r\n");
             }
+
+            // Image Service diagnostics
+            txtSystemStatus.AppendText("\r\n=== IMAGE SERVICE ===\r\n\r\n");
+            txtSystemStatus.AppendText($"Unsplash Integration: {(_config.UseUnsplashImages ? "✓ Enabled" : "✗ Disabled")}\r\n");
+            if (_config.UseUnsplashImages)
+            {
+                txtSystemStatus.AppendText($"API Key: {(string.IsNullOrEmpty(_config.UnsplashApiKey) ? "✗ Not Set" : "✓ Configured")}\r\n");
+            }
+
+            // System Resources
+            txtSystemStatus.AppendText("\r\n=== SYSTEM RESOURCES ===\r\n\r\n");
+            txtSystemStatus.AppendText($"Working Directory: {Environment.CurrentDirectory}\r\n");
+            txtSystemStatus.AppendText($"Config File: {(File.Exists(_configPath) ? "✓ Found" : "✗ Not Found")}\r\n");
+            txtSystemStatus.AppendText($"Output Directory: {_config.DefaultOutputPath}\r\n");
+            txtSystemStatus.AppendText($"Output Dir Exists: {(Directory.Exists(_config.DefaultOutputPath) ? "✓ Yes" : "✗ No")}\r\n");
+            
+            try
+            {
+                var drive = new DriveInfo(Path.GetPathRoot(Environment.CurrentDirectory) ?? "C:\\");
+                var freeSpaceGB = drive.AvailableFreeSpace / (1024.0 * 1024.0 * 1024.0);
+                txtSystemStatus.AppendText($"Free Disk Space: {freeSpaceGB:F2} GB\r\n");
+                if (freeSpaceGB < 5)
+                {
+                    txtSystemStatus.AppendText("⚠ Warning: Low disk space (< 5 GB)\r\n");
+                }
+            }
+            catch { }
+
+            // Final Summary
+            txtSystemStatus.AppendText("\r\n");
+            txtSystemStatus.AppendText("═══════════════════════════════════════════════════════════\r\n");
+            var allAvailable = status.Values.All(v => v);
+            if (allAvailable)
+            {
+                txtSystemStatus.AppendText("✓ ALL SYSTEMS OPERATIONAL - Ready to generate videos!\r\n");
+            }
+            else
+            {
+                var missingCount = status.Values.Count(v => !v);
+                txtSystemStatus.AppendText($"⚠ {missingCount} SERVICE(S) UNAVAILABLE - Please resolve issues above\r\n");
+                txtSystemStatus.AppendText("\r\nQuick Fixes:\r\n");
+                txtSystemStatus.AppendText("  1. Check Settings tab for correct paths\r\n");
+                txtSystemStatus.AppendText("  2. Run installation scripts (install-piper.bat, etc.)\r\n");
+                txtSystemStatus.AppendText("  3. See TROUBLESHOOTING.md for detailed help\r\n");
+                txtSystemStatus.AppendText("  4. Use Debug Console tab to start/monitor Ollama\r\n");
+            }
+            txtSystemStatus.AppendText("═══════════════════════════════════════════════════════════\r\n");
         }
         catch (Exception ex)
         {
-            txtSystemStatus.AppendText($"\r\nError checking status: {ex.Message}\r\n");
+            txtSystemStatus.AppendText($"\r\n✗ ERROR DURING STATUS CHECK:\r\n");
+            txtSystemStatus.AppendText($"Message: {ex.Message}\r\n");
+            txtSystemStatus.AppendText($"Type: {ex.GetType().Name}\r\n");
+            if (ex.InnerException != null)
+            {
+                txtSystemStatus.AppendText($"Inner Exception: {ex.InnerException.Message}\r\n");
+            }
+            txtSystemStatus.AppendText($"\r\nStack Trace:\r\n{ex.StackTrace}\r\n");
         }
         finally
         {
@@ -883,8 +1006,19 @@ public partial class MainForm : Form
     private void BtnClearConsole_Click(object? sender, EventArgs e)
     {
         txtOllamaConsole.Clear();
-        AppendConsole("=== Console Cleared ===");
+        AppendConsole("╔════════════════════════════════════════════════════════╗");
+        AppendConsole("║         VOID VIDEO GENERATOR - DEBUG CONSOLE          ║");
+        AppendConsole("╚════════════════════════════════════════════════════════╝");
+        AppendConsole("");
+        AppendConsole("Console cleared");
         AppendConsole($"Time: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+        AppendConsole("");
+        AppendConsole("Debug Console Commands:");
+        AppendConsole("  • Start Ollama Server - Launch local Ollama instance");
+        AppendConsole("  • Stop Ollama Server - Terminate Ollama process");
+        AppendConsole("  • Clear Console - Clear this output");
+        AppendConsole("");
+        AppendConsole("Tip: All Ollama output will appear here in real-time");
         AppendConsole("");
     }
 

@@ -21,6 +21,8 @@ public partial class MainForm : Form
         PopulateFormFromConfig();
         ApplyTheme(_config.DarkMode);
         CheckOllamaRunning();
+        SetupTooltips();
+        SetupKeyboardShortcuts();
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e)
@@ -298,24 +300,65 @@ public partial class MainForm : Form
     {
         if (_pipeline == null)
         {
-            MessageBox.Show("Services not initialized. Please check settings.", "Error", 
+            MessageBox.Show("Services not initialized. Please check settings.", "Error",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
 
-        // Validate inputs
+        // Enhanced validation
         if (string.IsNullOrWhiteSpace(txtTitle.Text))
         {
-            MessageBox.Show("Please enter a video title.", "Validation Error", 
+            MessageBox.Show("Please enter a video title.", "Validation Error",
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            txtTitle.Focus();
+            return;
+        }
+
+        if (txtTitle.Text.Length < 5)
+        {
+            MessageBox.Show("Video title is too short. Please enter at least 5 characters.", "Validation Error",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            txtTitle.Focus();
             return;
         }
 
         if (string.IsNullOrWhiteSpace(txtTopic.Text))
         {
-            MessageBox.Show("Please enter a topic/description.", "Validation Error", 
+            MessageBox.Show("Please enter a topic/description.", "Validation Error",
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            txtTopic.Focus();
             return;
+        }
+
+        if (txtTopic.Text.Length < 10)
+        {
+            MessageBox.Show("Topic description is too short. Please provide more details (at least 10 characters).", "Validation Error",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            txtTopic.Focus();
+            return;
+        }
+
+        if (!Directory.Exists(txtOutputPath.Text))
+        {
+            var result = MessageBox.Show($"Output directory does not exist:\n{txtOutputPath.Text}\n\nCreate it now?",
+                "Directory Not Found", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                try
+                {
+                    Directory.CreateDirectory(txtOutputPath.Text);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to create directory:\n{ex.Message}", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
+            else
+            {
+                return;
+            }
         }
 
         // Disable controls during generation
@@ -1179,5 +1222,123 @@ public partial class MainForm : Form
         txtCaptionsLog.AppendText($"{message}\r\n");
         txtCaptionsLog.SelectionStart = txtCaptionsLog.Text.Length;
         txtCaptionsLog.ScrollToCaret();
+    }
+
+    // === ENHANCEMENT METHODS ===
+
+    private void SetupTooltips()
+    {
+        var toolTip = new ToolTip
+        {
+            AutoPopDelay = 5000,
+            InitialDelay = 500,
+            ReshowDelay = 100,
+            ShowAlways = true
+        };
+
+        // Generate Tab Tooltips
+        toolTip.SetToolTip(txtTitle, "Enter a catchy title for your video (e.g., '10 Amazing Facts About Space')");
+        toolTip.SetToolTip(txtTopic, "Describe what your video should be about. Be specific for better results.");
+        toolTip.SetToolTip(numDuration, "Target video length in seconds. Actual length may vary slightly.");
+        toolTip.SetToolTip(txtNiche, "Your channel's focus area (e.g., Technology, Education, Entertainment)");
+        toolTip.SetToolTip(txtPersona, "The personality of your narrator (e.g., Friendly expert, Enthusiastic teacher)");
+        toolTip.SetToolTip(txtTone, "How the script should sound (e.g., Professional, Casual, Humorous)");
+        toolTip.SetToolTip(txtAudience, "Who is watching? (e.g., Beginners, Professionals, General audience)");
+        toolTip.SetToolTip(txtStyle, "Content approach (e.g., Tutorial, Storytelling, Documentary)");
+        toolTip.SetToolTip(btnAddImages, "Add custom images to use in your video. Images will be shown in order.");
+        toolTip.SetToolTip(btnGenerate, "Start generating your video! This may take several minutes.");
+
+        // Captions Tab Tooltips
+        toolTip.SetToolTip(txtInputVideo, "Select the video file you want to add captions to");
+        toolTip.SetToolTip(txtOutputVideo, "Where to save the video with captions");
+        toolTip.SetToolTip(cmbCaptionStyle, "Choose caption style: YouTube (classic), TikTok (bold), or Minimal");
+        toolTip.SetToolTip(btnGenerateCaptions, "Generate and add captions to your video using AI transcription");
+
+        // Settings Tab Tooltips
+        toolTip.SetToolTip(cmbAiProvider, "Choose your AI provider: Ollama (local), OpenAI, Anthropic, or Gemini");
+        toolTip.SetToolTip(txtOllamaUrl, "URL where Ollama is running (default: http://localhost:11434)");
+        toolTip.SetToolTip(txtOllamaModel, "Ollama model to use (e.g., llama3.1, mistral, phi3)");
+        toolTip.SetToolTip(txtPiperPath, "Path to Piper TTS executable for voice generation");
+        toolTip.SetToolTip(txtFFmpegPath, "Path to FFmpeg executable for video processing");
+        toolTip.SetToolTip(chkUseGpu, "Enable GPU acceleration for faster video encoding (requires compatible GPU)");
+        toolTip.SetToolTip(cmbGpuEncoder, "GPU encoder to use: h264_nvenc (NVIDIA), h264_amf (AMD), h264_qsv (Intel)");
+        toolTip.SetToolTip(chkEnableKenBurns, "Add smooth zoom and pan effects to images (Ken Burns effect)");
+        toolTip.SetToolTip(chkEnableCrossfade, "Smooth transitions between images instead of hard cuts");
+        toolTip.SetToolTip(numTransitionDuration, "How long transitions last in seconds");
+        toolTip.SetToolTip(numZoomIntensity, "Zoom strength for Ken Burns effect (1.0 = no zoom, 1.5 = strong zoom)");
+        toolTip.SetToolTip(btnSaveSettings, "Save all settings to config.json");
+
+        // Status Tab Tooltips
+        toolTip.SetToolTip(btnCheckStatus, "Run comprehensive system diagnostics to check if all components are working");
+
+        // Debug Console Tooltips
+        toolTip.SetToolTip(btnStartOllama, "Launch Ollama server process for local AI script generation");
+        toolTip.SetToolTip(btnStopOllama, "Stop the Ollama server process");
+        toolTip.SetToolTip(btnClearConsole, "Clear the debug console output");
+    }
+
+    private void SetupKeyboardShortcuts()
+    {
+        // Ctrl+G = Generate Video
+        this.KeyPreview = true;
+        this.KeyDown += (s, e) =>
+        {
+            if (e.Control && e.KeyCode == Keys.G && btnGenerate.Enabled)
+            {
+                e.Handled = true;
+                BtnGenerate_Click(null, EventArgs.Empty);
+            }
+            // Ctrl+S = Save Settings
+            else if (e.Control && e.KeyCode == Keys.S && tabControl.SelectedTab == tabSettings)
+            {
+                e.Handled = true;
+                BtnSaveSettings_Click(null, EventArgs.Empty);
+            }
+            // Ctrl+T = Check Status
+            else if (e.Control && e.KeyCode == Keys.T && tabControl.SelectedTab == tabStatus)
+            {
+                e.Handled = true;
+                BtnCheckStatus_Click(null, EventArgs.Empty);
+            }
+            // F5 = Refresh/Check Status
+            else if (e.KeyCode == Keys.F5 && tabControl.SelectedTab == tabStatus)
+            {
+                e.Handled = true;
+                BtnCheckStatus_Click(null, EventArgs.Empty);
+            }
+            // Ctrl+Q = Quit
+            else if (e.Control && e.KeyCode == Keys.Q)
+            {
+                e.Handled = true;
+                this.Close();
+            }
+            // F1 = Switch to Generate Tab
+            else if (e.KeyCode == Keys.F1)
+            {
+                e.Handled = true;
+                tabControl.SelectedTab = tabGenerate;
+            }
+            // F2 = Switch to Captions Tab
+            else if (e.KeyCode == Keys.F2)
+            {
+                e.Handled = true;
+                tabControl.SelectedTab = tabCaptions;
+            }
+            // F3 = Switch to Settings Tab
+            else if (e.KeyCode == Keys.F3)
+            {
+                e.Handled = true;
+                tabControl.SelectedTab = tabSettings;
+            }
+            // F4 = Switch to Status Tab
+            else if (e.KeyCode == Keys.F4)
+            {
+                e.Handled = true;
+                tabControl.SelectedTab = tabStatus;
+            }
+        };
+
+        // Update form title to show shortcuts
+        this.Text = "Void Video Generator - [Ctrl+G: Generate | F1-F4: Switch Tabs | Ctrl+Q: Quit]";
     }
 }

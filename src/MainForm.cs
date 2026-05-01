@@ -276,7 +276,7 @@ public partial class MainForm : Form
             // Create output directory
             Directory.CreateDirectory(request.OutputPath);
 
-            var progress = new Progress<string>(message =>
+            IProgress<string> progress = new Progress<string>(message =>
             {
                 if (InvokeRequired)
                 {

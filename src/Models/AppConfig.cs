@@ -49,7 +49,7 @@ public class AppConfig
     /// <summary>
     /// Enable dark mode theme
     /// </summary>
-    public bool DarkMode { get; set; } = false;
+    public bool DarkMode { get; set; } = true;
     
     /// <summary>
     /// Enable GPU acceleration for video encoding (requires compatible GPU and FFmpeg build)

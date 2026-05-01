@@ -136,28 +136,132 @@ ollama run llama3.1 "Write a 30-second video script about AI"
 
 **Symptoms:**
 - "Piper TTS not available" error
+- "Piper TTS failed:" with empty error message
 - No audio files generated
+- Error during "Generating voice audio..." step
 
 **Solutions:**
 
-#### A. Piper not installed
-```bash
-# Download Piper for your platform
-# Windows: https://github.com/rhasspy/piper/releases
-# Extract to a known location
+#### A. Piper not installed or not in PATH
 
-# Test Piper
+**Symptoms:**
+```
+[17:35:12] Step 2/4: Generating voice audio...
+[17:35:12] Generating audio segment 1/1
+[17:35:12] Generating audio: segment_000_body.wav
+[17:35:13] ERROR: Piper TTS failed:
+[17:35:13] ✗ Error: Piper TTS failed:
+```
+
+**Diagnosis:**
+```bash
+# Check if Piper is installed
+which piper          # Linux/Mac
+where piper          # Windows
+
+# Or try running it directly
 piper --version
 ```
 
-#### B. Voice model not found
-```bash
-# Download a voice model
-# Example: en_US-lessac-medium
-# Place in: models/piper/
+**Solutions:**
 
-# Test voice generation
-echo "Hello world" | piper --model models/piper/en_US-lessac-medium.onnx --output_file test.wav
+1. **Install Piper (Linux/Codespaces):**
+   ```bash
+   # Download latest release
+   wget https://github.com/rhasspy/piper/releases/download/v1.2.0/piper_amd64.tar.gz
+   
+   # Extract
+   tar -xzf piper_amd64.tar.gz
+   
+   # Move to a location in PATH
+   sudo mv piper/piper /usr/local/bin/
+   
+   # Verify installation
+   piper --version
+   ```
+
+2. **Install Piper (Windows):**
+   ```bash
+   # Download from: https://github.com/rhasspy/piper/releases
+   # Extract piper_windows_amd64.zip to C:\Tools\piper\
+   
+   # Add to PATH or update config.json with full path:
+   # "PiperPath": "C:\\Tools\\piper\\piper.exe"
+   ```
+
+3. **Update config.json with correct path:**
+   ```json
+   {
+     "PiperPath": "/usr/local/bin/piper",
+     "PiperModelPath": "models/voice.onnx"
+   }
+   ```
+
+#### B. Voice model not found
+
+**Symptoms:**
+- "Piper TTS model not found" error
+- Process exits with error about missing .onnx file
+
+**Solutions:**
+
+1. **Download a voice model:**
+   ```bash
+   # Create models directory
+   mkdir -p models
+   
+   # Download voice model (example: en_US-lessac-medium)
+   wget https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx -O models/voice.onnx
+   wget https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json -O models/voice.onnx.json
+   ```
+
+2. **Verify model files exist:**
+   ```bash
+   ls -la models/
+   # Should show both .onnx and .onnx.json files
+   ```
+
+3. **Test voice generation manually:**
+   ```bash
+   echo "Hello world" | piper --model models/voice.onnx --output_file test.wav
+   
+   # If successful, test.wav should be created
+   # Play it to verify: aplay test.wav (Linux) or start test.wav (Windows)
+   ```
+
+#### C. Recommended Voice Models
+
+**For English (US):**
+- **Male - Professional:** `en_US-lessac-medium` (recommended)
+  - ONNX: https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx
+  - JSON: https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json
+
+- **Female - Natural:** `en_US-amy-medium`
+  - ONNX: https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/amy/medium/en_US-amy-medium.onnx
+  - JSON: https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/amy/medium/en_US-amy-medium.onnx.json
+
+- **Male - Clear:** `en_US-ryan-high` (higher quality, slower)
+  - ONNX: https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ryan/high/en_US-ryan-high.onnx
+  - JSON: https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ryan/high/en_US-ryan-high.onnx.json
+
+**Browse all voices:** https://github.com/rhasspy/piper/blob/master/VOICES.md
+
+#### D. Permission Issues
+
+**Symptoms:**
+- "Permission denied" errors
+- Cannot create output files
+
+**Solutions:**
+```bash
+# Make piper executable (Linux/Mac)
+chmod +x /usr/local/bin/piper
+
+# Ensure output directory is writable
+chmod 755 output/
+
+# Check file permissions
+ls -la models/
 ```
 
 ### 4. Video Assembly Fails

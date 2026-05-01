@@ -78,18 +78,74 @@ public class PiperTTSService : IVoiceGeneratorService
                 }
             };
 
-            process.Start();
-            
+            // Start reading error output asynchronously before starting the process
+            var errorOutputBuilder = new System.Text.StringBuilder();
+            var standardOutputBuilder = new System.Text.StringBuilder();
+
+            try
+            {
+                process.Start();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to start Piper TTS. Make sure Piper is installed and the path '{_piperPath}' is correct. Error: {ex.Message}");
+            }
+
+            // Read output streams asynchronously to prevent deadlocks
+            var errorTask = Task.Run(async () =>
+            {
+                while (!process.StandardError.EndOfStream)
+                {
+                    var line = await process.StandardError.ReadLineAsync();
+                    if (line != null)
+                    {
+                        errorOutputBuilder.AppendLine(line);
+                    }
+                }
+            });
+
+            var outputTask = Task.Run(async () =>
+            {
+                while (!process.StandardOutput.EndOfStream)
+                {
+                    var line = await process.StandardOutput.ReadLineAsync();
+                    if (line != null)
+                    {
+                        standardOutputBuilder.AppendLine(line);
+                    }
+                }
+            });
+
             // Write text to stdin
             await process.StandardInput.WriteAsync(cleanText);
             process.StandardInput.Close();
 
+            // Wait for process and output reading to complete
             await process.WaitForExitAsync();
+            await Task.WhenAll(errorTask, outputTask);
 
             if (process.ExitCode != 0)
             {
-                var error = await process.StandardError.ReadToEndAsync();
-                throw new Exception($"Piper TTS failed: {error}");
+                var errorOutput = errorOutputBuilder.ToString().Trim();
+                var standardOutput = standardOutputBuilder.ToString().Trim();
+                
+                var errorMessage = !string.IsNullOrEmpty(errorOutput) ? errorOutput :
+                                   !string.IsNullOrEmpty(standardOutput) ? standardOutput :
+                                   $"Process exited with code {process.ExitCode}";
+                
+                // Check for common issues
+                if (errorMessage.Contains("No such file") || errorMessage.Contains("not found"))
+                {
+                    throw new Exception($"Piper TTS model not found. Please ensure the model file exists at: {_modelPath}");
+                }
+                
+                throw new Exception($"Piper TTS failed: {errorMessage}");
+            }
+
+            // Verify output file was created
+            if (!File.Exists(outputPath))
+            {
+                throw new Exception($"Piper TTS completed but output file was not created: {outputPath}");
             }
 
             progress?.Report($"Audio generated: {Path.GetFileName(outputPath)}");

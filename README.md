@@ -66,6 +66,22 @@ ollama list
 
 ### Step 3: Install Piper TTS (Local Voice)
 
+**Quick Install (Recommended):**
+
+**Windows:**
+```bash
+# Run the automated installer
+install-piper.bat
+```
+
+**Linux/Codespaces:**
+```bash
+# Run the automated installer
+./install-piper.sh
+```
+
+**Manual Installation:**
+
 1. Download Piper from: https://github.com/rhasspy/piper/releases
 2. Extract to a folder (e.g., `C:\Tools\piper`)
 3. Download a voice model from: https://github.com/rhasspy/piper/blob/master/VOICES.md

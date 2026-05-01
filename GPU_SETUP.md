@@ -1,4 +1,4 @@
-# GPU Acceleration Setup Guide
+ # GPU Acceleration Setup Guide
 
 The Void Video Generator supports GPU-accelerated video encoding for significantly faster video generation (3-10x faster than CPU encoding).
 

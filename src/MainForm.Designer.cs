@@ -372,9 +372,20 @@ partial class MainForm
         
         // OpenAI Settings
         var lblOpenAiKey = new Label { Text = "OpenAI API Key:", Location = new Point(10, aiYPos), AutoSize = true };
-        txtOpenAiApiKey = new TextBox { Location = new Point(150, aiYPos), Size = new Size(430, 25), UseSystemPasswordChar = true };
+        txtOpenAiApiKey = new TextBox { Location = new Point(150, aiYPos), Size = new Size(350, 25), UseSystemPasswordChar = true };
+        var btnTestOpenAI = new Button {
+            Text = "Test",
+            Location = new Point(510, aiYPos - 2),
+            Size = new Size(70, 28),
+            BackColor = ThemeColors.Dark.Primary,
+            ForeColor = Color.White,
+            FlatStyle = FlatStyle.Flat
+        };
+        btnTestOpenAI.FlatAppearance.BorderSize = 0;
+        btnTestOpenAI.Click += async (s, e) => await TestApiConnection("openai");
         grpAiProvider.Controls.Add(lblOpenAiKey);
         grpAiProvider.Controls.Add(txtOpenAiApiKey);
+        grpAiProvider.Controls.Add(btnTestOpenAI);
         aiYPos += 30;
         
         var lblOpenAiModel = new Label { Text = "OpenAI Model:", Location = new Point(10, aiYPos), AutoSize = true };
@@ -385,9 +396,20 @@ partial class MainForm
         
         // Anthropic Settings
         var lblAnthropicKey = new Label { Text = "Anthropic API Key:", Location = new Point(10, aiYPos), AutoSize = true };
-        txtAnthropicApiKey = new TextBox { Location = new Point(150, aiYPos), Size = new Size(430, 25), UseSystemPasswordChar = true };
+        txtAnthropicApiKey = new TextBox { Location = new Point(150, aiYPos), Size = new Size(350, 25), UseSystemPasswordChar = true };
+        var btnTestAnthropic = new Button {
+            Text = "Test",
+            Location = new Point(510, aiYPos - 2),
+            Size = new Size(70, 28),
+            BackColor = ThemeColors.Dark.Primary,
+            ForeColor = Color.White,
+            FlatStyle = FlatStyle.Flat
+        };
+        btnTestAnthropic.FlatAppearance.BorderSize = 0;
+        btnTestAnthropic.Click += async (s, e) => await TestApiConnection("anthropic");
         grpAiProvider.Controls.Add(lblAnthropicKey);
         grpAiProvider.Controls.Add(txtAnthropicApiKey);
+        grpAiProvider.Controls.Add(btnTestAnthropic);
         aiYPos += 30;
         
         var lblAnthropicModel = new Label { Text = "Anthropic Model:", Location = new Point(10, aiYPos), AutoSize = true };
@@ -398,9 +420,20 @@ partial class MainForm
         
         // Gemini Settings
         var lblGeminiKey = new Label { Text = "Gemini API Key:", Location = new Point(10, aiYPos), AutoSize = true };
-        txtGeminiApiKey = new TextBox { Location = new Point(150, aiYPos), Size = new Size(430, 25), UseSystemPasswordChar = true };
+        txtGeminiApiKey = new TextBox { Location = new Point(150, aiYPos), Size = new Size(350, 25), UseSystemPasswordChar = true };
+        var btnTestGemini = new Button {
+            Text = "Test",
+            Location = new Point(510, aiYPos - 2),
+            Size = new Size(70, 28),
+            BackColor = ThemeColors.Dark.Primary,
+            ForeColor = Color.White,
+            FlatStyle = FlatStyle.Flat
+        };
+        btnTestGemini.FlatAppearance.BorderSize = 0;
+        btnTestGemini.Click += async (s, e) => await TestApiConnection("gemini");
         grpAiProvider.Controls.Add(lblGeminiKey);
         grpAiProvider.Controls.Add(txtGeminiApiKey);
+        grpAiProvider.Controls.Add(btnTestGemini);
         aiYPos += 30;
         
         var lblGeminiModel = new Label { Text = "Gemini Model:", Location = new Point(10, aiYPos), AutoSize = true };
@@ -727,8 +760,13 @@ partial class MainForm
             Text = "Save All Settings",
             Location = new Point(10, yPos),
             Size = new Size(200, 40),
-            Font = new Font("Segoe UI", 10, FontStyle.Bold)
+            Font = new Font("Segoe UI", 10, FontStyle.Bold),
+            BackColor = ThemeColors.Dark.Primary,
+            ForeColor = Color.White,
+            FlatStyle = FlatStyle.Flat,
+            Cursor = Cursors.Hand
         };
+        btnSaveSettings.FlatAppearance.BorderSize = 0;
         btnSaveSettings.Click += BtnSaveSettings_Click;
         settingsPanel.Controls.Add(btnSaveSettings);
 

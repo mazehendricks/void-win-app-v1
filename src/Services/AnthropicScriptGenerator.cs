@@ -28,7 +28,13 @@ public class AnthropicScriptGenerator : IScriptGeneratorService
     {
         try
         {
-            // Simple check - try to make a minimal request
+            // Check if API key is set
+            if (string.IsNullOrWhiteSpace(_apiKey))
+            {
+                return false;
+            }
+
+            // Simple check - try to make a minimal request with timeout
             var testRequest = new
             {
                 model = _model,
@@ -39,8 +45,22 @@ public class AnthropicScriptGenerator : IScriptGeneratorService
             var json = JsonSerializer.Serialize(testRequest);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             
-            var response = await _httpClient.PostAsync(API_URL, content);
+            // Set a reasonable timeout for the availability check
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            var response = await _httpClient.PostAsync(API_URL, content, cts.Token);
+            
+            // Consider both success and rate limit as "available"
             return response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.TooManyRequests;
+        }
+        catch (TaskCanceledException)
+        {
+            // Timeout - service might be slow but could still work
+            return false;
+        }
+        catch (HttpRequestException)
+        {
+            // Network error
+            return false;
         }
         catch
         {
@@ -87,7 +107,26 @@ public class AnthropicScriptGenerator : IScriptGeneratorService
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new Exception($"Anthropic API error: {response.StatusCode} - {responseContent}");
+                // Provide more detailed error information
+                var errorMessage = $"Anthropic API error: {response.StatusCode}";
+                
+                try
+                {
+                    var errorJson = JsonSerializer.Deserialize<JsonElement>(responseContent);
+                    if (errorJson.TryGetProperty("error", out var errorObj))
+                    {
+                        if (errorObj.TryGetProperty("message", out var message))
+                        {
+                            errorMessage += $" - {message.GetString()}";
+                        }
+                    }
+                }
+                catch
+                {
+                    errorMessage += $" - {responseContent}";
+                }
+                
+                throw new Exception(errorMessage);
             }
 
             var result = JsonSerializer.Deserialize<JsonElement>(responseContent);
@@ -98,6 +137,19 @@ public class AnthropicScriptGenerator : IScriptGeneratorService
 
             progress?.Report("Parsing script...");
             return ParseScript(scriptText);
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new Exception($"Network error connecting to Anthropic API: {ex.Message}. Please check your internet connection.", ex);
+        }
+        catch (TaskCanceledException)
+        {
+            throw new Exception("Request to Anthropic API timed out. Please try again.");
+        }
+        catch (Exception ex) when (ex.Message.Contains("Anthropic API error"))
+        {
+            // Re-throw API errors as-is
+            throw;
         }
         catch (Exception ex)
         {

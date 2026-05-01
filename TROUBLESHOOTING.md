@@ -1,9 +1,10 @@
 # Troubleshooting Guide
 
-## Quick Test Script
+## Quick Test Scripts
 
-Before diving into troubleshooting, run the included test script:
+Before diving into troubleshooting, run the included test scripts:
 
+### For Ollama (Local AI)
 ```bash
 # Windows
 test-ollama.bat
@@ -15,7 +16,24 @@ test-ollama.bat
 # 4. Show you the response
 ```
 
-If this test passes, your Ollama setup is correct and the issue is elsewhere.
+### For Anthropic API (Cloud AI)
+```bash
+# Windows
+test-anthropic.bat
+
+# Linux/Mac
+./test-anthropic.sh
+
+# This will:
+# 1. Check config.json exists
+# 2. Test internet connectivity
+# 3. Verify API endpoint is reachable
+# 4. Test your API key with a real request
+```
+
+If these tests pass, your AI setup is correct and the issue is elsewhere.
+
+**For detailed Anthropic troubleshooting, see [ANTHROPIC_TROUBLESHOOTING.md](ANTHROPIC_TROUBLESHOOTING.md)**
 
 ## Common Issues and Solutions
 

@@ -770,11 +770,137 @@ public partial class MainForm : Form
         };
 
         SaveConfiguration();
-        InitializeServices();
+        
+        // Log which AI provider is being configured
+        LogMessage($"Settings saved - AI Provider: {_config.AiProvider.ToUpper()}");
+        
+        try
+        {
+            InitializeServices();
+            LogMessage("Services reinitialized successfully");
+            
+            MessageBox.Show(
+                "Settings saved successfully!\n\n" +
+                $"AI Provider: {_config.AiProvider.ToUpper()}\n" +
+                "Services have been reinitialized.\n\n" +
+                "Go to System Status tab to verify all services are available.",
+                "Success",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
+        catch (Exception ex)
+        {
+            LogMessage($"Error reinitializing services: {ex.Message}");
+            MessageBox.Show(
+                $"Settings saved, but there was an issue initializing services:\n\n{ex.Message}\n\n" +
+                "Please check the System Status tab for details.",
+                "Warning",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning);
+        }
+        
         ApplyTheme(_config.DarkMode);
+    }
 
-        MessageBox.Show("Settings saved successfully!", "Success",
-            MessageBoxButtons.OK, MessageBoxIcon.Information);
+    private async Task TestApiConnection(string provider)
+    {
+        try
+        {
+            string apiKey = "";
+            string model = "";
+            IScriptGeneratorService? testService = null;
+
+            switch (provider.ToLower())
+            {
+                case "openai":
+                    apiKey = txtOpenAiApiKey.Text;
+                    model = txtOpenAiModel.Text;
+                    if (string.IsNullOrWhiteSpace(apiKey))
+                    {
+                        MessageBox.Show("Please enter an OpenAI API key first.", "Missing API Key",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    LogMessage($"Testing OpenAI API connection with model {model}...");
+                    testService = new OpenAIScriptGenerator(apiKey, model);
+                    break;
+
+                case "anthropic":
+                    apiKey = txtAnthropicApiKey.Text;
+                    model = txtAnthropicModel.Text;
+                    if (string.IsNullOrWhiteSpace(apiKey))
+                    {
+                        MessageBox.Show("Please enter an Anthropic API key first.", "Missing API Key",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    LogMessage($"Testing Anthropic API connection with model {model}...");
+                    testService = new AnthropicScriptGenerator(apiKey, model);
+                    break;
+
+                case "gemini":
+                    apiKey = txtGeminiApiKey.Text;
+                    model = txtGeminiModel.Text;
+                    if (string.IsNullOrWhiteSpace(apiKey))
+                    {
+                        MessageBox.Show("Please enter a Gemini API key first.", "Missing API Key",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    LogMessage($"Testing Gemini API connection with model {model}...");
+                    testService = new GeminiScriptGenerator(apiKey, model);
+                    break;
+
+                default:
+                    MessageBox.Show($"Unknown provider: {provider}", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+            }
+
+            // Test the connection
+            var isAvailable = await testService.IsAvailableAsync();
+
+            if (isAvailable)
+            {
+                LogMessage($"✓ {provider.ToUpper()} API connection successful!");
+                MessageBox.Show(
+                    $"✓ Connection Successful!\n\n" +
+                    $"Provider: {provider.ToUpper()}\n" +
+                    $"Model: {model}\n\n" +
+                    "Your API key is valid and the service is available.\n" +
+                    "Click 'Save Settings' to use this configuration.",
+                    "Connection Test Passed",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            else
+            {
+                LogMessage($"✗ {provider.ToUpper()} API connection failed");
+                MessageBox.Show(
+                    $"✗ Connection Failed\n\n" +
+                    $"Provider: {provider.ToUpper()}\n" +
+                    $"Model: {model}\n\n" +
+                    "Possible issues:\n" +
+                    "• Invalid or expired API key\n" +
+                    "• No internet connection\n" +
+                    "• Service is temporarily unavailable\n" +
+                    "• Rate limit exceeded\n\n" +
+                    $"See {provider.ToUpper()}_TROUBLESHOOTING.md for detailed help.",
+                    "Connection Test Failed",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            LogMessage($"Error testing {provider} API: {ex.Message}");
+            MessageBox.Show(
+                $"Error testing {provider.ToUpper()} API:\n\n{ex.Message}\n\n" +
+                "Check the console log for more details.",
+                "Test Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+        }
     }
 
     private void ApplyTheme(bool darkMode)
@@ -1341,4 +1467,5 @@ public partial class MainForm : Form
         // Update form title to show shortcuts
         this.Text = "Void Video Generator - [Ctrl+G: Generate | F1-F4: Switch Tabs | Ctrl+Q: Quit]";
     }
+
 }

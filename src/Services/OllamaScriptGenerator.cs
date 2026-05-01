@@ -7,11 +7,12 @@ using VoidVideoGenerator.Models;
 /// <summary>
 /// Script generator using local Ollama LLM
 /// </summary>
-public class OllamaScriptGenerator : IScriptGeneratorService
+public class OllamaScriptGenerator : IScriptGeneratorService, IDisposable
 {
     private readonly HttpClient _httpClient;
     private readonly string _baseUrl;
     private readonly string _model;
+    private bool _disposed = false;
 
     public OllamaScriptGenerator(string baseUrl = "http://localhost:11434", string model = "llama3.1")
     {
@@ -21,6 +22,15 @@ public class OllamaScriptGenerator : IScriptGeneratorService
         {
             Timeout = TimeSpan.FromMinutes(5)
         };
+    }
+
+    public void Dispose()
+    {
+        if (!_disposed)
+        {
+            _httpClient?.Dispose();
+            _disposed = true;
+        }
     }
 
     public async Task<bool> IsAvailableAsync()

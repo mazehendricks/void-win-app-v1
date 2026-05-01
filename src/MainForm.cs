@@ -10,6 +10,7 @@ public partial class MainForm : Form
     private VideoGenerationPipeline? _pipeline;
     private readonly string _configPath = "config.json";
     private System.Diagnostics.Process? _ollamaProcess;
+    private List<string> _visualImagePaths = new();
 
     public MainForm()
     {
@@ -121,6 +122,9 @@ public partial class MainForm : Form
         txtPiperPath.Text = _config.PiperPath;
         txtPiperModel.Text = _config.PiperModelPath;
         txtFFmpegPath.Text = _config.FFmpegPath;
+        chkUseUnsplash.Checked = _config.UseUnsplashImages;
+        txtUnsplashApiKey.Text = _config.UnsplashApiKey;
+        txtUnsplashApiKey.Enabled = _config.UseUnsplashImages;
         chkDarkMode.Checked = _config.DarkMode;
         chkUseGpu.Checked = _config.UseGpuAcceleration;
         cmbGpuEncoder.SelectedItem = _config.GpuEncoder;
@@ -153,6 +157,71 @@ public partial class MainForm : Form
         if (dialog.ShowDialog() == DialogResult.OK)
         {
             txtOutputPath.Text = dialog.SelectedPath;
+        }
+    }
+
+    private void BtnAddImages_Click(object? sender, EventArgs e)
+    {
+        using var dialog = new OpenFileDialog
+        {
+            Title = "Select Images for Video",
+            Filter = "Image Files|*.png;*.jpg;*.jpeg;*.bmp;*.gif|All Files|*.*",
+            Multiselect = true
+        };
+
+        if (dialog.ShowDialog() == DialogResult.OK)
+        {
+            foreach (var file in dialog.FileNames)
+            {
+                if (!_visualImagePaths.Contains(file))
+                {
+                    _visualImagePaths.Add(file);
+                    lstVisuals.Items.Add(Path.GetFileName(file));
+                }
+            }
+            
+            LogMessage($"Added {dialog.FileNames.Length} image(s) to visuals");
+        }
+    }
+
+    private void BtnRemoveImages_Click(object? sender, EventArgs e)
+    {
+        if (lstVisuals.SelectedIndices.Count == 0)
+        {
+            MessageBox.Show("Please select images to remove.", "No Selection",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
+        }
+
+        // Remove in reverse order to maintain correct indices
+        var selectedIndices = lstVisuals.SelectedIndices.Cast<int>().OrderByDescending(i => i).ToList();
+        foreach (var index in selectedIndices)
+        {
+            _visualImagePaths.RemoveAt(index);
+            lstVisuals.Items.RemoveAt(index);
+        }
+        
+        LogMessage($"Removed {selectedIndices.Count} image(s) from visuals");
+    }
+
+    private void BtnClearImages_Click(object? sender, EventArgs e)
+    {
+        if (_visualImagePaths.Count == 0)
+        {
+            return;
+        }
+
+        var result = MessageBox.Show(
+            $"Are you sure you want to clear all {_visualImagePaths.Count} images?",
+            "Clear All Images",
+            MessageBoxButtons.YesNo,
+            MessageBoxIcon.Question);
+
+        if (result == DialogResult.Yes)
+        {
+            _visualImagePaths.Clear();
+            lstVisuals.Items.Clear();
+            LogMessage("Cleared all images from visuals");
         }
     }
 
@@ -225,7 +294,86 @@ public partial class MainForm : Form
             LogMessage($"Output: {request.OutputPath}");
             LogMessage("");
 
-            var videoPath = await _pipeline.GenerateVideoAsync(request, progress);
+            // Generate script first to get visual cues
+            var script = await _scriptGenerator!.GenerateScriptAsync(request, progress);
+            
+            // Handle visuals - priority: user images > Unsplash > placeholders
+            var visualsDir = Path.Combine(request.OutputPath, "visuals");
+            Directory.CreateDirectory(visualsDir);
+            
+            if (_visualImagePaths.Count > 0)
+            {
+                // Use user-provided images
+                LogMessage($"Using {_visualImagePaths.Count} user-provided images...");
+                
+                for (int i = 0; i < _visualImagePaths.Count; i++)
+                {
+                    var sourcePath = _visualImagePaths[i];
+                    var extension = Path.GetExtension(sourcePath);
+                    var destPath = Path.Combine(visualsDir, $"image_{i:D3}{extension}");
+                    File.Copy(sourcePath, destPath, true);
+                }
+                
+                LogMessage($"✓ Copied {_visualImagePaths.Count} images to visuals directory");
+            }
+            else if (_config.UseUnsplashImages && !string.IsNullOrEmpty(_config.UnsplashApiKey))
+            {
+                // Use Unsplash to generate images from visual cues
+                try
+                {
+                    LogMessage("Generating images from Unsplash based on visual cues...");
+                    var unsplashService = new UnsplashImageService(_config.UnsplashApiKey);
+                    
+                    if (script.VisualCues.Count > 0)
+                    {
+                        await unsplashService.DownloadImagesFromCuesAsync(
+                            script.VisualCues,
+                            visualsDir,
+                            imagesPerCue: 1,
+                            progress);
+                    }
+                    else
+                    {
+                        LogMessage("⚠ No visual cues found in script, using topic for image search");
+                        await unsplashService.DownloadImagesFromCuesAsync(
+                            new List<string> { request.Topic },
+                            visualsDir,
+                            imagesPerCue: 3,
+                            progress);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogMessage($"⚠ Unsplash image generation failed: {ex.Message}");
+                    LogMessage("Falling back to placeholder visuals");
+                }
+            }
+            else
+            {
+                LogMessage("⚠ No images provided - video will use placeholder visuals");
+            }
+            
+            LogMessage("");
+
+            // Continue with rest of pipeline (audio and video assembly)
+            var audioDirectory = Path.Combine(request.OutputPath, "audio");
+            Directory.CreateDirectory(audioDirectory);
+            
+            progress?.Report("Step 2/4: Generating voice audio...");
+            var voiceGenerator = new PiperTTSService(_config.PiperPath, _config.PiperModelPath);
+            var audioFiles = await voiceGenerator.GenerateScriptAudioAsync(script, audioDirectory, progress);
+            
+            // Save script for reference
+            var scriptPath = Path.Combine(request.OutputPath, "script.txt");
+            await File.WriteAllTextAsync(scriptPath, script.FullText);
+            progress?.Report($"Script saved to: {scriptPath}");
+            
+            // Assemble video
+            progress?.Report("Step 4/4: Assembling final video...");
+            var videoPath = Path.Combine(request.OutputPath, $"{SanitizeFileName(request.Title)}.mp4");
+            await _videoAssembly!.CreateVideoFromScriptAsync(script, audioDirectory, visualsDir, videoPath, progress);
+            
+            progress?.Report($"✓ Video generation complete: {videoPath}");
 
             MessageBox.Show($"Video generated successfully!\n\nLocation: {videoPath}", 
                 "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -336,6 +484,8 @@ public partial class MainForm : Form
         _config.PiperModelPath = txtPiperModel.Text;
         _config.FFmpegPath = txtFFmpegPath.Text;
         _config.DefaultOutputPath = txtOutputPath.Text;
+        _config.UseUnsplashImages = chkUseUnsplash.Checked;
+        _config.UnsplashApiKey = txtUnsplashApiKey.Text;
         _config.DarkMode = chkDarkMode.Checked;
         _config.UseGpuAcceleration = chkUseGpu.Checked;
         _config.GpuEncoder = cmbGpuEncoder.SelectedItem?.ToString() ?? "auto";

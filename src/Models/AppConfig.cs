@@ -13,6 +13,17 @@ public class AppConfig
     public string DefaultOutputPath { get; set; } = "output";
     
     /// <summary>
+    /// Unsplash API Access Key for automatic image generation
+    /// Get your free API key at: https://unsplash.com/developers
+    /// </summary>
+    public string UnsplashApiKey { get; set; } = "";
+    
+    /// <summary>
+    /// Enable automatic image generation from Unsplash
+    /// </summary>
+    public bool UseUnsplashImages { get; set; } = false;
+    
+    /// <summary>
     /// Enable dark mode theme
     /// </summary>
     public bool DarkMode { get; set; } = false;

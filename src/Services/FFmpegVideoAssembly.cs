@@ -42,7 +42,7 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
     {
         try
         {
-            var process = new Process
+            using var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
@@ -147,7 +147,7 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
 
         try
         {
-            var process = new Process
+            using var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
@@ -186,7 +186,7 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
 
     private async Task<double> GetAudioDurationAsync(string audioPath)
     {
-        var process = new Process
+        using var process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
@@ -261,7 +261,7 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
             string audioCodec = GetAudioCodecArguments();
             string scaleFilter = GetScaleFilter();
             
-            var process = new Process
+            using var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
@@ -346,6 +346,8 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
     /// </summary>
     private string GetScaleFilter()
     {
+        _outputSettings ??= new VideoOutputSettings(); // Null safety
+        
         // Only add scale filter if resolution is not 1920x1080 (default)
         if (_outputSettings.Width != 1920 || _outputSettings.Height != 1080)
         {
@@ -389,7 +391,7 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
     {
         try
         {
-            var process = new Process
+            using var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
@@ -428,7 +430,7 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
         var placeholderPath = Path.Combine(outputDirectory, "placeholder.png");
         var resolution = $"{_outputSettings.Width}x{_outputSettings.Height}";
         
-        var process = new Process
+        using var process = new Process
         {
             StartInfo = new ProcessStartInfo
             {

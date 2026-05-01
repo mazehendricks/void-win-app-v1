@@ -135,10 +135,61 @@ partial class MainForm
         generatePanel.Controls.Add(btnBrowseOutput);
         yPos += 60;
 
+        // Visuals Section
+        var grpVisuals = new GroupBox {
+            Text = "Visuals (Images for Video)",
+            Location = new Point(10, yPos),
+            Size = new Size(900, 120)
+        };
+        
+        var lblVisualsInfo = new Label {
+            Text = "Add images to use in your video. Images will be displayed in order during the video.",
+            Location = new Point(10, 25),
+            Size = new Size(880, 20),
+            ForeColor = Color.DarkBlue
+        };
+        
+        lstVisuals = new ListBox {
+            Location = new Point(10, 50),
+            Size = new Size(700, 60),
+            SelectionMode = SelectionMode.MultiExtended
+        };
+        lstVisuals.SelectedIndexChanged += (s, e) => {
+            btnRemoveImages.Enabled = lstVisuals.SelectedIndices.Count > 0;
+        };
+        
+        btnAddImages = new Button {
+            Text = "Add Images",
+            Location = new Point(720, 50),
+            Size = new Size(85, 27)
+        };
+        btnAddImages.Click += BtnAddImages_Click;
+        
+        btnRemoveImages = new Button {
+            Text = "Remove",
+            Location = new Point(720, 83),
+            Size = new Size(85, 27),
+            Enabled = false
+        };
+        btnRemoveImages.Click += BtnRemoveImages_Click;
+        
+        btnClearImages = new Button {
+            Text = "Clear All",
+            Location = new Point(810, 50),
+            Size = new Size(80, 27)
+        };
+        btnClearImages.Click += BtnClearImages_Click;
+        
+        grpVisuals.Controls.AddRange(new Control[] {
+            lblVisualsInfo, lstVisuals, btnAddImages, btnRemoveImages, btnClearImages
+        });
+        generatePanel.Controls.Add(grpVisuals);
+        yPos += 130;
+
         // Generate Button
-        btnGenerate = new Button { 
-            Text = "Generate Video", 
-            Location = new Point(10, yPos), 
+        btnGenerate = new Button {
+            Text = "Generate Video",
+            Location = new Point(10, yPos),
             Size = new Size(200, 40),
             Font = new Font("Segoe UI", 12, FontStyle.Bold)
         };
@@ -146,8 +197,8 @@ partial class MainForm
         generatePanel.Controls.Add(btnGenerate);
 
         // Progress
-        progressBar = new ProgressBar { 
-            Location = new Point(220, yPos + 5), 
+        progressBar = new ProgressBar {
+            Location = new Point(220, yPos + 5),
             Size = new Size(690, 30),
             Style = ProgressBarStyle.Marquee,
             Visible = false
@@ -202,6 +253,47 @@ partial class MainForm
         settingsPanel.Controls.Add(lblFFmpegPath);
         settingsPanel.Controls.Add(txtFFmpegPath);
         yPos += 35;
+
+        // Unsplash API Section
+        var grpUnsplash = new GroupBox {
+            Text = "Unsplash Image Generation (Optional)",
+            Location = new Point(10, yPos),
+            Size = new Size(600, 110)
+        };
+        
+        chkUseUnsplash = new CheckBox {
+            Text = "Enable automatic image generation from Unsplash",
+            Location = new Point(10, 25),
+            Size = new Size(580, 20)
+        };
+        chkUseUnsplash.CheckedChanged += (s, e) => {
+            txtUnsplashApiKey.Enabled = chkUseUnsplash.Checked;
+        };
+        
+        var lblUnsplashKey = new Label {
+            Text = "API Key:",
+            Location = new Point(10, 55),
+            AutoSize = true
+        };
+        
+        txtUnsplashApiKey = new TextBox {
+            Location = new Point(80, 52),
+            Size = new Size(500, 25),
+            Enabled = false
+        };
+        
+        var lblUnsplashInfo = new Label {
+            Text = "Get your free API key at: https://unsplash.com/developers",
+            Location = new Point(10, 82),
+            Size = new Size(580, 20),
+            ForeColor = Color.DarkBlue
+        };
+        
+        grpUnsplash.Controls.AddRange(new Control[] {
+            chkUseUnsplash, lblUnsplashKey, txtUnsplashApiKey, lblUnsplashInfo
+        });
+        settingsPanel.Controls.Add(grpUnsplash);
+        yPos += 120;
 
         // Dark Mode Toggle
         chkDarkMode = new CheckBox {
@@ -462,6 +554,10 @@ partial class MainForm
     private TextBox txtStyle;
     private TextBox txtOutputPath;
     private Button btnBrowseOutput;
+    private ListBox lstVisuals;
+    private Button btnAddImages;
+    private Button btnRemoveImages;
+    private Button btnClearImages;
     private Button btnGenerate;
     private ProgressBar progressBar;
     private TextBox txtLog;
@@ -472,6 +568,8 @@ partial class MainForm
     private TextBox txtPiperPath;
     private TextBox txtPiperModel;
     private TextBox txtFFmpegPath;
+    private CheckBox chkUseUnsplash;
+    private TextBox txtUnsplashApiKey;
     private CheckBox chkDarkMode;
     private CheckBox chkUseGpu;
     private ComboBox cmbGpuEncoder;

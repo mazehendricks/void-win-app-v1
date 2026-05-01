@@ -303,6 +303,7 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
     /// </summary>
     private string GetVideoCodecArguments()
     {
+        _outputSettings ??= new VideoOutputSettings(); // Null safety
         int bitrate = _outputSettings.VideoBitrate;
         int maxrate = (int)(bitrate * 1.5);
         
@@ -417,15 +418,16 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
         Directory.CreateDirectory(outputDirectory);
         var imageFiles = new List<string>();
 
-        // Create a simple black placeholder image using FFmpeg
+        // Create a simple black placeholder image using FFmpeg with configured resolution
         var placeholderPath = Path.Combine(outputDirectory, "placeholder.png");
+        var resolution = $"{_outputSettings.Width}x{_outputSettings.Height}";
         
         var process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = _ffmpegPath,
-                Arguments = $"-f lavfi -i color=c=black:s=1920x1080:d=1 -frames:v 1 \"{placeholderPath}\"",
+                Arguments = $"-f lavfi -i color=c=black:s={resolution}:d=1 -frames:v 1 \"{placeholderPath}\"",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,

@@ -736,7 +736,7 @@ public partial class MainForm : Form
         _config.DefaultOutputPath = txtOutputPath.Text;
         _config.UseUnsplashImages = chkUseUnsplash.Checked;
         _config.UnsplashApiKey = txtUnsplashApiKey.Text;
-        _config.DarkMode = chkDarkMode.Checked;
+        _config.DarkMode = true; // Always use dark mode
         _config.UseGpuAcceleration = chkUseGpu.Checked;
         _config.GpuEncoder = cmbGpuEncoder.SelectedItem?.ToString() ?? "auto";
 

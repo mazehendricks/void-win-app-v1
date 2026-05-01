@@ -128,10 +128,11 @@ partial class MainForm
         // Output Path
         var lblOutput = new Label { Text = "Output Folder:", Location = new Point(10, yPos), AutoSize = true };
         txtOutputPath = new TextBox { Location = new Point(10, yPos + 25), Size = new Size(800, 25) };
-        btnBrowseOutput = new Button { 
-            Text = "Browse...", 
-            Location = new Point(820, yPos + 23), 
-            Size = new Size(90, 27) 
+        btnBrowseOutput = new Button {
+            Text = "Browse...",
+            Location = new Point(820, yPos + 23),
+            Size = new Size(100, 30),
+            AutoSize = false
         };
         btnBrowseOutput.Click += BtnBrowseOutput_Click;
         generatePanel.Controls.Add(lblOutput);
@@ -165,22 +166,25 @@ partial class MainForm
         btnAddImages = new Button {
             Text = "Add Images",
             Location = new Point(720, 50),
-            Size = new Size(85, 27)
+            Size = new Size(100, 30),
+            AutoSize = false
         };
         btnAddImages.Click += BtnAddImages_Click;
         
         btnRemoveImages = new Button {
             Text = "Remove",
             Location = new Point(720, 83),
-            Size = new Size(85, 27),
-            Enabled = false
+            Size = new Size(100, 30),
+            Enabled = false,
+            AutoSize = false
         };
         btnRemoveImages.Click += BtnRemoveImages_Click;
         
         btnClearImages = new Button {
             Text = "Clear All",
-            Location = new Point(810, 50),
-            Size = new Size(80, 27)
+            Location = new Point(830, 50),
+            Size = new Size(100, 30),
+            AutoSize = false
         };
         btnClearImages.Click += BtnClearImages_Click;
         
@@ -290,8 +294,9 @@ partial class MainForm
         btnGenerateCaptions = new Button {
             Text = "Generate Captions",
             Location = new Point(10, yPos),
-            Size = new Size(200, 40),
-            Font = new Font("Segoe UI", 10, FontStyle.Bold)
+            Size = new Size(220, 45),
+            Font = new Font("Segoe UI", 10, FontStyle.Bold),
+            AutoSize = false
         };
         btnGenerateCaptions.Click += BtnGenerateCaptions_Click;
         captionsPanel.Controls.Add(btnGenerateCaptions);
@@ -465,19 +470,7 @@ partial class MainForm
         settingsPanel.Controls.Add(grpUnsplash);
         yPos += 120;
 
-        // Dark Mode Toggle
-        chkDarkMode = new CheckBox {
-            Text = "Enable Dark Mode",
-            Location = new Point(200, yPos),
-            AutoSize = true
-        };
-        chkDarkMode.CheckedChanged += (s, e) => {
-            // Theme will be applied when settings are saved
-        };
-        settingsPanel.Controls.Add(chkDarkMode);
-        yPos += 35;
-
-        // GPU Acceleration Section
+        // GPU Acceleration Section (Dark Mode is always enabled)
         var grpGpuSettings = new GroupBox {
             Text = "Video Encoding Settings",
             Location = new Point(10, yPos),
@@ -802,25 +795,28 @@ partial class MainForm
 
         btnStartOllama = new Button {
             Text = "Start Ollama Server",
-            Size = new Size(150, 35),
-            Margin = new Padding(0, 0, 10, 0)
+            Size = new Size(180, 40),
+            Margin = new Padding(0, 0, 10, 0),
+            AutoSize = false
         };
         btnStartOllama.Click += BtnStartOllama_Click;
         buttonPanel.Controls.Add(btnStartOllama);
 
         btnStopOllama = new Button {
             Text = "Stop Ollama Server",
-            Size = new Size(150, 35),
+            Size = new Size(180, 40),
             Enabled = false,
-            Margin = new Padding(0, 0, 10, 0)
+            Margin = new Padding(0, 0, 10, 0),
+            AutoSize = false
         };
         btnStopOllama.Click += BtnStopOllama_Click;
         buttonPanel.Controls.Add(btnStopOllama);
 
         btnClearConsole = new Button {
             Text = "Clear Console",
-            Size = new Size(120, 35),
-            Margin = new Padding(0, 0, 10, 0)
+            Size = new Size(150, 40),
+            Margin = new Padding(0, 0, 10, 0),
+            AutoSize = false
         };
         btnClearConsole.Click += BtnClearConsole_Click;
         buttonPanel.Controls.Add(btnClearConsole);
@@ -874,7 +870,6 @@ partial class MainForm
     private TextBox txtFFmpegPath;
     private CheckBox chkUseUnsplash;
     private TextBox txtUnsplashApiKey;
-    private CheckBox chkDarkMode;
     private CheckBox chkUseGpu;
     private ComboBox cmbGpuEncoder;
     private ComboBox cmbResolution;

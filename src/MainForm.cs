@@ -184,7 +184,6 @@ public partial class MainForm : Form
         chkUseUnsplash.Checked = _config.UseUnsplashImages;
         txtUnsplashApiKey.Text = _config.UnsplashApiKey;
         txtUnsplashApiKey.Enabled = _config.UseUnsplashImages;
-        chkDarkMode.Checked = _config.DarkMode;
         chkUseGpu.Checked = _config.UseGpuAcceleration;
         cmbGpuEncoder.SelectedItem = _config.GpuEncoder;
 

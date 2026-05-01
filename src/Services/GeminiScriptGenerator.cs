@@ -52,6 +52,14 @@ public class GeminiScriptGenerator : IScriptGeneratorService
 
     public async Task<VideoScript> GenerateScriptAsync(
         VideoRequest request,
+        IProgress<string>? progress = null)
+    {
+        var channelDNA = new ChannelDNA(); // Use default if not provided
+        return await GenerateScriptWithChannelDNAAsync(request, channelDNA, progress);
+    }
+
+    private async Task<VideoScript> GenerateScriptWithChannelDNAAsync(
+        VideoRequest request,
         ChannelDNA channelDNA,
         IProgress<string>? progress = null)
     {

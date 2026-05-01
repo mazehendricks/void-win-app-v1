@@ -5,6 +5,8 @@
   "PiperModelPath": "models/voice.onnx",
   "FFmpegPath": "ffmpeg",
   "DefaultOutputPath": "output",
+  "UseGpuAcceleration": false,
+  "GpuEncoder": "auto",
   "DefaultChannelDNA": {
     "Niche": "Educational",
     "HostPersona": "Friendly expert",

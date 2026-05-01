@@ -75,6 +75,7 @@ public partial class MainForm : Form
     }
 
     private OllamaScriptGenerator? _scriptGenerator;
+    private FFmpegVideoAssembly? _videoAssembly;
     
     private void InitializeServices()
     {
@@ -82,10 +83,15 @@ public partial class MainForm : Form
         {
             _scriptGenerator = new OllamaScriptGenerator(_config.OllamaUrl, _config.OllamaModel);
             var voiceGenerator = new PiperTTSService(_config.PiperPath, _config.PiperModelPath);
-            var videoAssembly = new FFmpegVideoAssembly(_config.FFmpegPath);
+            _videoAssembly = new FFmpegVideoAssembly(_config.FFmpegPath, _config.UseGpuAcceleration, _config.GpuEncoder);
 
-            _pipeline = new VideoGenerationPipeline(_scriptGenerator, voiceGenerator, videoAssembly);
+            _pipeline = new VideoGenerationPipeline(_scriptGenerator, voiceGenerator, _videoAssembly);
             LogMessage("Services initialized");
+            LogMessage($"GPU Acceleration: {(_config.UseGpuAcceleration ? "Enabled" : "Disabled")}");
+            if (_config.UseGpuAcceleration)
+            {
+                LogMessage($"GPU Encoder: {_config.GpuEncoder}");
+            }
         }
         catch (Exception ex)
         {
@@ -101,6 +107,8 @@ public partial class MainForm : Form
         txtPiperPath.Text = _config.PiperPath;
         txtPiperModel.Text = _config.PiperModelPath;
         txtFFmpegPath.Text = _config.FFmpegPath;
+        chkUseGpu.Checked = _config.UseGpuAcceleration;
+        cmbGpuEncoder.SelectedItem = _config.GpuEncoder;
 
         // Generate tab - Channel DNA defaults
         txtNiche.Text = _config.DefaultChannelDNA.Niche;
@@ -305,6 +313,8 @@ public partial class MainForm : Form
         _config.PiperModelPath = txtPiperModel.Text;
         _config.FFmpegPath = txtFFmpegPath.Text;
         _config.DefaultOutputPath = txtOutputPath.Text;
+        _config.UseGpuAcceleration = chkUseGpu.Checked;
+        _config.GpuEncoder = cmbGpuEncoder.SelectedItem?.ToString() ?? "auto";
 
         _config.DefaultChannelDNA = new ChannelDNA
         {
@@ -318,7 +328,7 @@ public partial class MainForm : Form
         SaveConfiguration();
         InitializeServices();
 
-        MessageBox.Show("Settings saved successfully!", "Success", 
+        MessageBox.Show("Settings saved successfully!", "Success",
             MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 

@@ -12,6 +12,16 @@ public class AppConfig
     public string FFmpegPath { get; set; } = "ffmpeg";
     public string DefaultOutputPath { get; set; } = "output";
     
+    /// <summary>
+    /// Enable GPU acceleration for video encoding (requires compatible GPU and FFmpeg build)
+    /// </summary>
+    public bool UseGpuAcceleration { get; set; } = false;
+    
+    /// <summary>
+    /// GPU encoder to use: nvidia (NVENC), amd (AMF), intel (QSV), or auto
+    /// </summary>
+    public string GpuEncoder { get; set; } = "auto";
+    
     public ChannelDNA DefaultChannelDNA { get; set; } = new()
     {
         Niche = "Educational",

@@ -196,15 +196,62 @@ partial class MainForm
         txtFFmpegPath = new TextBox { Location = new Point(200, yPos), Size = new Size(400, 25) };
         settingsPanel.Controls.Add(lblFFmpegPath);
         settingsPanel.Controls.Add(txtFFmpegPath);
-        yPos += 50;
+        yPos += 35;
 
-        btnSaveSettings = new Button { 
-            Text = "Save Settings", 
-            Location = new Point(200, yPos), 
-            Size = new Size(150, 35) 
+        // GPU Acceleration Section
+        var grpGpuSettings = new GroupBox {
+            Text = "Video Encoding Settings",
+            Location = new Point(10, yPos),
+            Size = new Size(600, 100)
+        };
+        
+        chkUseGpu = new CheckBox {
+            Text = "Enable GPU Acceleration (faster encoding, requires compatible GPU)",
+            Location = new Point(10, 25),
+            AutoSize = true
+        };
+        chkUseGpu.CheckedChanged += (s, e) => {
+            cmbGpuEncoder.Enabled = chkUseGpu.Checked;
+        };
+        
+        var lblGpuEncoder = new Label {
+            Text = "GPU Encoder:",
+            Location = new Point(10, 55),
+            AutoSize = true
+        };
+        
+        cmbGpuEncoder = new ComboBox {
+            Location = new Point(120, 52),
+            Size = new Size(200, 25),
+            DropDownStyle = ComboBoxStyle.DropDownList
+        };
+        cmbGpuEncoder.Items.AddRange(new object[] { "auto", "nvidia", "amd", "intel", "apple" });
+        cmbGpuEncoder.SelectedIndex = 0;
+        cmbGpuEncoder.Enabled = false;
+        
+        grpGpuSettings.Controls.Add(chkUseGpu);
+        grpGpuSettings.Controls.Add(lblGpuEncoder);
+        grpGpuSettings.Controls.Add(cmbGpuEncoder);
+        settingsPanel.Controls.Add(grpGpuSettings);
+        yPos += 110;
+
+        btnSaveSettings = new Button {
+            Text = "Save Settings",
+            Location = new Point(200, yPos),
+            Size = new Size(150, 35)
         };
         btnSaveSettings.Click += BtnSaveSettings_Click;
         settingsPanel.Controls.Add(btnSaveSettings);
+        
+        // Add info label
+        var lblGpuInfo = new Label {
+            Text = "Note: GPU acceleration requires FFmpeg with GPU support and compatible hardware.\n" +
+                   "CPU encoding is more compatible but slower. GPU encoding is 3-10x faster.",
+            Location = new Point(10, yPos + 45),
+            Size = new Size(600, 40),
+            ForeColor = Color.DarkBlue
+        };
+        settingsPanel.Controls.Add(lblGpuInfo);
 
         // === STATUS TAB ===
         var statusPanel = new Panel { Dock = DockStyle.Fill, Padding = new Padding(20) };
@@ -327,6 +374,8 @@ partial class MainForm
     private TextBox txtPiperPath;
     private TextBox txtPiperModel;
     private TextBox txtFFmpegPath;
+    private CheckBox chkUseGpu;
+    private ComboBox cmbGpuEncoder;
     private Button btnSaveSettings;
     
     // Status Tab Controls

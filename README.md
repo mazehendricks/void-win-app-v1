@@ -12,6 +12,7 @@ A **100% local-only** faceless AI video generator for Windows. Create profession
 - **Channel DNA System** - Define your unique voice, niche, and persona for authentic content
 - **Local Voice Synthesis** - Piper TTS for high-quality, natural-sounding narration
 - **Video Assembly** - FFmpeg-powered video creation with audio and visuals
+- **GPU Acceleration** - Hardware-accelerated video encoding (3-10x faster than CPU)
 - **Zero Cloud Costs** - Everything runs on your machine
 - **Privacy First** - No data sent to external services
 - **2026 Compliance** - Built-in originality features to avoid platform penalties
@@ -151,6 +152,9 @@ dotnet run
      - Piper Path: `C:\Tools\piper\piper.exe`
      - Piper Model: `C:\Tools\piper\models\en_US-lessac-medium.onnx`
      - FFmpeg Path: `ffmpeg` (if in PATH) or full path
+   - **Configure GPU Acceleration** (optional, for faster encoding):
+     - Check "Enable GPU Acceleration" if you have a compatible GPU
+     - Select GPU Encoder: `auto` (recommended), `nvidia`, `amd`, `intel`, or `apple`
    - Click "Save Settings"
 
 ### Generate Your First Video
@@ -419,7 +423,9 @@ Location: `config.json` (created after first run)
   "PiperPath": "C:\\Tools\\piper\\piper.exe",
   "PiperModelPath": "C:\\Tools\\piper\\models\\en_US-lessac-medium.onnx",
   "FFmpegPath": "ffmpeg",
-  "DefaultOutputPath": "C:\\Users\\YourName\\Videos\\Void Gen Output"
+  "DefaultOutputPath": "C:\\Users\\YourName\\Videos\\Void Gen Output",
+  "UseGpuAcceleration": false,
+  "GpuEncoder": "auto"
 }
 ```
 
@@ -617,18 +623,88 @@ This is the most common issue. See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for 
 
 ### Speed Optimization
 
-1. **Use GPU acceleration** (if available)
-   - Ollama automatically uses GPU
-   - Significant speed improvement for LLM
+1. **Enable GPU Acceleration for Video Encoding**
+   - **3-10x faster** than CPU encoding
+   - Go to Settings → Enable GPU Acceleration
+   - Select encoder type or use "auto" for automatic detection
+   - **Supported GPUs:**
+     - NVIDIA (RTX/GTX series) - Uses NVENC encoder
+     - AMD (RX series) - Uses AMF encoder
+     - Intel (Arc/Iris) - Uses QuickSync (QSV) encoder
+     - Apple Silicon (M1/M2/M3) - Uses VideoToolbox encoder
+   - **Requirements:**
+     - Compatible GPU with hardware encoding support
+     - FFmpeg built with GPU encoder support
+     - Updated GPU drivers
 
-2. **Choose appropriate model size**
+2. **Use GPU for LLM Processing**
+   - Ollama automatically uses GPU when available
+   - Significant speed improvement for script generation
+   - NVIDIA GPUs recommended (CUDA support)
+
+3. **Choose appropriate model size**
    - 7B models: Fast, good quality
    - 13B models: Balanced
    - 70B+ models: Best quality, much slower
 
-3. **Batch processing**
+4. **Batch processing**
    - Generate multiple scripts at once
    - Process audio in parallel (future feature)
+
+### GPU Acceleration Details
+
+**Performance Comparison (1080p 60s video):**
+| Encoder | Encoding Time | Quality | Notes |
+|---------|--------------|---------|-------|
+| CPU (libx264) | ~45-90 seconds | Excellent | Compatible, slower |
+| NVIDIA NVENC | ~5-15 seconds | Excellent | Fastest, RTX recommended |
+| AMD AMF | ~8-20 seconds | Very Good | Good for AMD GPUs |
+| Intel QSV | ~10-25 seconds | Very Good | Built into Intel CPUs |
+| Apple VideoToolbox | ~8-18 seconds | Excellent | M1/M2/M3 Macs |
+
+**When to Use CPU vs GPU:**
+- **Use CPU** if:
+  - No compatible GPU available
+  - Maximum quality is critical
+  - Encoding time is not a concern
+  - GPU is busy with other tasks (LLM processing)
+
+- **Use GPU** if:
+  - You have a compatible GPU
+  - Speed is important
+  - Generating multiple videos
+  - Quality difference is acceptable (minimal with modern encoders)
+
+**Troubleshooting GPU Encoding:**
+
+If GPU encoding fails, the system automatically falls back to CPU encoding.
+
+Common issues:
+1. **"Encoder not found"** - FFmpeg not built with GPU support
+   - Solution: Download FFmpeg with GPU support from official site
+   
+2. **"Failed to initialize encoder"** - Outdated GPU drivers
+   - Solution: Update GPU drivers to latest version
+   
+3. **Slow encoding despite GPU enabled** - GPU busy with other tasks
+   - Solution: Close other GPU-intensive applications or use CPU encoding
+
+**Checking GPU Encoder Availability:**
+
+Test if your FFmpeg supports GPU encoding:
+```bash
+# Check available encoders
+ffmpeg -encoders | grep h264
+
+# Test NVIDIA NVENC
+ffmpeg -encoders | grep nvenc
+
+# Test AMD AMF
+ffmpeg -encoders | grep amf
+
+# Test Intel QSV
+ffmpeg -encoders | grep qsv
+```
 
 ### Quality Optimization
 

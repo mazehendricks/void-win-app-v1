@@ -123,8 +123,9 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
         progress?.Report("Concatenating audio files...");
 
         // Create concat file list
-        var concatFile = Path.GetTempFileName();
-        var concatContent = string.Join("\n", audioFiles.Select(f => $"file '{f}'"));
+        var concatFile = Path.Combine(Path.GetTempPath(), $"ffmpeg_audio_concat_{Guid.NewGuid()}.txt");
+        // Use forward slashes for FFmpeg compatibility on all platforms
+        var concatContent = string.Join("\n", audioFiles.Select(f => $"file '{f.Replace("\\", "/")}'"));
         await File.WriteAllTextAsync(concatFile, concatContent);
 
         try
@@ -206,18 +207,21 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
         var durationPerImage = audioDuration / imageFiles.Count;
 
         // Create input file list with durations
-        var inputFile = Path.GetTempFileName();
+        var inputFile = Path.Combine(Path.GetTempPath(), $"ffmpeg_concat_{Guid.NewGuid()}.txt");
         var inputContent = new System.Text.StringBuilder();
         
         foreach (var image in imageFiles)
         {
-            inputContent.AppendLine($"file '{image}'");
-            inputContent.AppendLine($"duration {durationPerImage}");
+            // Use forward slashes for FFmpeg compatibility on all platforms
+            var imagePath = image.Replace("\\", "/");
+            inputContent.AppendLine($"file '{imagePath}'");
+            inputContent.AppendLine($"duration {durationPerImage:F6}");
         }
         // Add last image again for proper ending
         if (imageFiles.Count > 0)
         {
-            inputContent.AppendLine($"file '{imageFiles[^1]}'");
+            var lastImagePath = imageFiles[^1].Replace("\\", "/");
+            inputContent.AppendLine($"file '{lastImagePath}'");
         }
 
         await File.WriteAllTextAsync(inputFile, inputContent.ToString());

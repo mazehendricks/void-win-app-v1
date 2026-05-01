@@ -66,6 +66,11 @@ public class AppConfig
     /// </summary>
     public VideoOutputSettings VideoSettings { get; set; } = new();
     
+    /// <summary>
+    /// AI Video Generation configuration
+    /// </summary>
+    public AIVideoConfig AIVideoGeneration { get; set; } = new();
+    
     public ChannelDNA DefaultChannelDNA { get; set; } = new()
     {
         Niche = "Educational",

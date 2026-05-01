@@ -37,6 +37,44 @@
     "TransitionDuration": 1.0,
     "ZoomIntensity": 1.2
   },
+  "AIVideoGeneration": {
+    "Provider": "None",
+    "RunwayML": {
+      "ApiKey": "",
+      "BaseUrl": "https://api.runwayml.com/v1",
+      "MaxDuration": 10,
+      "DefaultModel": "gen3",
+      "TimeoutSeconds": 300
+    },
+    "LumaAI": {
+      "ApiKey": "",
+      "BaseUrl": "https://api.lumalabs.ai/v1",
+      "MaxDuration": 5,
+      "TimeoutSeconds": 300
+    },
+    "AnimateDiff": {
+      "ComfyUIEndpoint": "http://localhost:8188",
+      "ModelPath": "models/animatediff/mm_sd_v15_v2.ckpt",
+      "CheckpointPath": "models/checkpoints/realisticVisionV51.safetensors",
+      "Steps": 20,
+      "CFG": 7.5,
+      "Sampler": "euler_ancestral",
+      "TimeoutSeconds": 600
+    },
+    "Hybrid": {
+      "ImageModelPath": "",
+      "InterpolationMethod": "RIFE",
+      "KeyframeInterval": 12,
+      "TargetFPS": 24
+    },
+    "DefaultSettings": {
+      "AspectRatio": "16:9",
+      "MotionIntensity": 5.0,
+      "Style": "realistic",
+      "NegativePrompt": "blurry, low quality, distorted, watermark, text",
+      "DefaultDuration": 4
+    }
+  },
   "DefaultChannelDNA": {
     "Niche": "Educational",
     "HostPersona": "Friendly expert",

@@ -614,82 +614,98 @@ public partial class MainForm : Form
 
     private void ApplyTheme(bool darkMode)
     {
-        var colors = darkMode ?
-            (ThemeColors.Dark.Background, ThemeColors.Dark.Surface, ThemeColors.Dark.Text, ThemeColors.Dark.Primary, ThemeColors.Dark.Border) :
-            (ThemeColors.Light.Background, ThemeColors.Light.Surface, ThemeColors.Light.Text, ThemeColors.Light.Primary, ThemeColors.Light.Border);
+        var theme = darkMode ? ThemeColors.Dark : ThemeColors.Light;
 
         // Apply to form
-        this.BackColor = colors.Background;
-        this.ForeColor = colors.Text;
+        this.BackColor = theme.Background;
+        this.ForeColor = theme.Text;
 
         // Apply to all controls recursively
-        ApplyThemeToControls(this.Controls, colors.Background, colors.Surface, colors.Text, colors.Primary, colors.Border);
+        ApplyThemeToControls(this.Controls, theme);
     }
 
-    private void ApplyThemeToControls(Control.ControlCollection controls, Color background, Color surface, Color text, Color primary, Color border)
+    private void ApplyThemeToControls(Control.ControlCollection controls, dynamic theme)
     {
         foreach (Control control in controls)
         {
             // Skip controls that should maintain their own colors
             if (control is Button btn)
             {
-                btn.BackColor = primary;
+                btn.BackColor = theme.Primary;
                 btn.ForeColor = Color.White;
                 btn.FlatStyle = FlatStyle.Flat;
-                btn.FlatAppearance.BorderColor = border;
+                btn.FlatAppearance.BorderColor = theme.Border;
+                btn.FlatAppearance.BorderSize = 0;
+                btn.Padding = new Padding(10, 5, 10, 5);
+                btn.Cursor = Cursors.Hand;
             }
-            else if (control is TextBox || control is RichTextBox)
+            else if (control is TextBox txt)
             {
-                control.BackColor = surface;
-                control.ForeColor = text;
+                txt.BackColor = theme.InputBackground;
+                txt.ForeColor = theme.Text;
+                txt.BorderStyle = BorderStyle.FixedSingle;
+            }
+            else if (control is RichTextBox rtxt)
+            {
+                rtxt.BackColor = theme.InputBackground;
+                rtxt.ForeColor = theme.Text;
+                rtxt.BorderStyle = BorderStyle.FixedSingle;
             }
             else if (control is ComboBox cmb)
             {
-                cmb.BackColor = surface;
-                cmb.ForeColor = text;
+                cmb.BackColor = theme.InputBackground;
+                cmb.ForeColor = theme.Text;
                 cmb.FlatStyle = FlatStyle.Flat;
             }
             else if (control is NumericUpDown num)
             {
-                num.BackColor = surface;
-                num.ForeColor = text;
+                num.BackColor = theme.InputBackground;
+                num.ForeColor = theme.Text;
+                num.BorderStyle = BorderStyle.FixedSingle;
             }
-            else if (control is CheckBox || control is RadioButton || control is Label || control is GroupBox)
+            else if (control is ListBox lst)
             {
-                control.ForeColor = text;
-                if (control is GroupBox)
-                {
-                    control.BackColor = background;
-                }
+                lst.BackColor = theme.InputBackground;
+                lst.ForeColor = theme.Text;
+                lst.BorderStyle = BorderStyle.FixedSingle;
+            }
+            else if (control is CheckBox || control is RadioButton || control is Label)
+            {
+                control.ForeColor = theme.Text;
+            }
+            else if (control is GroupBox grp)
+            {
+                grp.ForeColor = theme.Text;
+                grp.FlatStyle = FlatStyle.Flat;
             }
             else if (control is TabControl tabControl)
             {
-                tabControl.BackColor = background;
+                tabControl.BackColor = theme.Background;
                 foreach (TabPage page in tabControl.TabPages)
                 {
-                    page.BackColor = background;
-                    page.ForeColor = text;
+                    page.BackColor = theme.Background;
+                    page.ForeColor = theme.Text;
                 }
             }
-            else if (control is TabPage)
+            else if (control is TabPage page)
             {
-                control.BackColor = background;
-                control.ForeColor = text;
+                page.BackColor = theme.Background;
+                page.ForeColor = theme.Text;
             }
-            else if (control is Panel || control is SplitContainer)
+            else if (control is Panel || control is FlowLayoutPanel || control is SplitContainer)
             {
-                control.BackColor = background;
+                control.BackColor = theme.Background;
             }
-            else if (control is ProgressBar)
+            else if (control is ProgressBar pb)
             {
                 // ProgressBar styling is limited in WinForms
-                control.BackColor = surface;
+                pb.BackColor = theme.Surface;
             }
 
             // Recursively apply to child controls
             if (control.HasChildren)
             {
-                ApplyThemeToControls(control.Controls, background, surface, text, primary, border);
+                ApplyThemeToControls(control.Controls, theme);
             }
         }
     }

@@ -12,7 +12,7 @@
   "PiperModelPath": "C:\\Tools\\piper\\models\\voice.onnx",
   "FFmpegPath": "ffmpeg",
   "DefaultOutputPath": "output",
-  "DarkMode": false,
+  "DarkMode": true,
   "UseGpuAcceleration": false,
   "GpuEncoder": "auto",
   "UnsplashApiKey": "",

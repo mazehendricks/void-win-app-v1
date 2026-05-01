@@ -850,4 +850,135 @@ public partial class MainForm : Form
         // For now, all fields remain visible for easy configuration
         LogMessage($"AI Provider changed to: {cmbAiProvider.SelectedItem}");
     }
+
+    // === CAPTIONS TAB EVENT HANDLERS ===
+    
+    private void BtnBrowseInputVideo_Click(object? sender, EventArgs e)
+    {
+        using var dialog = new OpenFileDialog
+        {
+            Filter = "Video Files|*.mp4;*.avi;*.mov;*.mkv;*.wmv;*.flv|All Files|*.*",
+            Title = "Select Input Video"
+        };
+
+        if (dialog.ShowDialog() == DialogResult.OK)
+        {
+            txtInputVideo.Text = dialog.FileName;
+            
+            // Auto-suggest output filename
+            if (string.IsNullOrEmpty(txtOutputVideo.Text))
+            {
+                var dir = Path.GetDirectoryName(dialog.FileName) ?? "";
+                var filename = Path.GetFileNameWithoutExtension(dialog.FileName);
+                txtOutputVideo.Text = Path.Combine(dir, $"{filename}_captioned.mp4");
+            }
+        }
+    }
+
+    private void BtnBrowseOutputVideo_Click(object? sender, EventArgs e)
+    {
+        using var dialog = new SaveFileDialog
+        {
+            Filter = "MP4 Video|*.mp4|All Files|*.*",
+            Title = "Save Captioned Video As",
+            DefaultExt = "mp4"
+        };
+
+        if (dialog.ShowDialog() == DialogResult.OK)
+        {
+            txtOutputVideo.Text = dialog.FileName;
+        }
+    }
+
+    private async void BtnGenerateCaptions_Click(object? sender, EventArgs e)
+    {
+        if (string.IsNullOrEmpty(txtInputVideo.Text) || !File.Exists(txtInputVideo.Text))
+        {
+            MessageBox.Show("Please select a valid input video file.", "Error",
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
+
+        if (string.IsNullOrEmpty(txtOutputVideo.Text))
+        {
+            MessageBox.Show("Please specify an output video path.", "Error",
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
+
+        btnGenerateCaptions.Enabled = false;
+        progressBarCaptions.Visible = true;
+        txtCaptionsLog.Clear();
+
+        try
+        {
+            var progress = new Progress<string>(message =>
+            {
+                if (InvokeRequired)
+                {
+                    Invoke(() => LogCaptionMessage(message));
+                }
+                else
+                {
+                    LogCaptionMessage(message);
+                }
+            });
+
+            LogCaptionMessage("=== Starting Caption Generation ===");
+            LogCaptionMessage($"Input: {txtInputVideo.Text}");
+            LogCaptionMessage($"Output: {txtOutputVideo.Text}");
+            LogCaptionMessage("");
+
+            // Step 1: Transcribe audio
+            LogCaptionMessage("Step 1/2: Transcribing audio...");
+            var transcriptionService = new WhisperTranscriptionService("whisper", "base");
+            var segments = await transcriptionService.TranscribeAsync(txtInputVideo.Text, progress);
+            
+            LogCaptionMessage($"✓ Transcription complete: {segments.Count} segments");
+            LogCaptionMessage("");
+
+            // Step 2: Add captions to video
+            LogCaptionMessage("Step 2/2: Adding captions to video...");
+            var captionService = new VideoCaptionService(_config.FFmpegPath);
+            
+            var style = cmbCaptionStyle.SelectedIndex switch
+            {
+                1 => CaptionStyle.TikTok,
+                2 => CaptionStyle.Minimal,
+                _ => CaptionStyle.YouTube
+            };
+
+            await captionService.AddCaptionsToVideoAsync(
+                txtInputVideo.Text,
+                segments,
+                txtOutputVideo.Text,
+                style,
+                progress);
+
+            LogCaptionMessage("");
+            LogCaptionMessage($"✓ Caption generation complete!");
+            LogCaptionMessage($"Output saved to: {txtOutputVideo.Text}");
+
+            MessageBox.Show($"Captions added successfully!\n\nOutput: {txtOutputVideo.Text}",
+                "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        catch (Exception ex)
+        {
+            LogCaptionMessage($"ERROR: {ex.Message}");
+            MessageBox.Show($"Error generating captions:\n\n{ex.Message}",
+                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        finally
+        {
+            btnGenerateCaptions.Enabled = true;
+            progressBarCaptions.Visible = false;
+        }
+    }
+
+    private void LogCaptionMessage(string message)
+    {
+        txtCaptionsLog.AppendText($"{message}\r\n");
+        txtCaptionsLog.SelectionStart = txtCaptionsLog.Text.Length;
+        txtCaptionsLog.ScrollToCaret();
+    }
 }

@@ -45,11 +45,13 @@ partial class MainForm
         
         // Tabs
         tabGenerate = new TabPage("Generate Video");
+        tabCaptions = new TabPage("Add Captions");
         tabSettings = new TabPage("Settings");
         tabStatus = new TabPage("System Status");
         tabDebug = new TabPage("Debug Console");
         
         tabControl.TabPages.Add(tabGenerate);
+        tabControl.TabPages.Add(tabCaptions);
         tabControl.TabPages.Add(tabSettings);
         tabControl.TabPages.Add(tabStatus);
         tabControl.TabPages.Add(tabDebug);
@@ -218,6 +220,103 @@ partial class MainForm
         };
         generatePanel.Controls.Add(lblLog);
         generatePanel.Controls.Add(txtLog);
+
+        // === CAPTIONS TAB ===
+        var captionsPanel = new Panel { Dock = DockStyle.Fill, Padding = new Padding(20) };
+        tabCaptions.Controls.Add(captionsPanel);
+
+        yPos = 10;
+        
+        var lblCaptionsTitle = new Label {
+            Text = "Add Captions to Existing Video",
+            Location = new Point(10, yPos),
+            Font = new Font("Segoe UI", 14, FontStyle.Bold),
+            AutoSize = true
+        };
+        captionsPanel.Controls.Add(lblCaptionsTitle);
+        yPos += 40;
+
+        // Input Video
+        var lblInputVideo = new Label { Text = "Input Video:", Location = new Point(10, yPos), AutoSize = true };
+        txtInputVideo = new TextBox { Location = new Point(120, yPos), Size = new Size(500, 25), ReadOnly = true };
+        btnBrowseInputVideo = new Button { Text = "Browse...", Location = new Point(630, yPos - 2), Size = new Size(100, 30) };
+        btnBrowseInputVideo.Click += BtnBrowseInputVideo_Click;
+        captionsPanel.Controls.Add(lblInputVideo);
+        captionsPanel.Controls.Add(txtInputVideo);
+        captionsPanel.Controls.Add(btnBrowseInputVideo);
+        yPos += 40;
+
+        // Output Video
+        var lblOutputVideo = new Label { Text = "Output Video:", Location = new Point(10, yPos), AutoSize = true };
+        txtOutputVideo = new TextBox { Location = new Point(120, yPos), Size = new Size(500, 25) };
+        btnBrowseOutputVideo = new Button { Text = "Browse...", Location = new Point(630, yPos - 2), Size = new Size(100, 30) };
+        btnBrowseOutputVideo.Click += BtnBrowseOutputVideo_Click;
+        captionsPanel.Controls.Add(lblOutputVideo);
+        captionsPanel.Controls.Add(txtOutputVideo);
+        captionsPanel.Controls.Add(btnBrowseOutputVideo);
+        yPos += 40;
+
+        // Caption Style
+        var lblCaptionStyle = new Label { Text = "Caption Style:", Location = new Point(10, yPos), AutoSize = true };
+        cmbCaptionStyle = new ComboBox {
+            Location = new Point(120, yPos),
+            Size = new Size(200, 25),
+            DropDownStyle = ComboBoxStyle.DropDownList
+        };
+        cmbCaptionStyle.Items.AddRange(new object[] { "YouTube", "TikTok", "Minimal", "Custom" });
+        cmbCaptionStyle.SelectedIndex = 0;
+        captionsPanel.Controls.Add(lblCaptionStyle);
+        captionsPanel.Controls.Add(cmbCaptionStyle);
+        yPos += 40;
+
+        // Transcription Method
+        var lblTranscriptionMethod = new Label { Text = "Transcription:", Location = new Point(10, yPos), AutoSize = true };
+        cmbTranscriptionMethod = new ComboBox {
+            Location = new Point(120, yPos),
+            Size = new Size(200, 25),
+            DropDownStyle = ComboBoxStyle.DropDownList
+        };
+        cmbTranscriptionMethod.Items.AddRange(new object[] { "Whisper (Local)", "Whisper (OpenAI API)", "Manual SRT File" });
+        cmbTranscriptionMethod.SelectedIndex = 0;
+        captionsPanel.Controls.Add(lblTranscriptionMethod);
+        captionsPanel.Controls.Add(cmbTranscriptionMethod);
+        yPos += 40;
+
+        // Generate Captions Button
+        btnGenerateCaptions = new Button {
+            Text = "Generate Captions",
+            Location = new Point(10, yPos),
+            Size = new Size(200, 40),
+            Font = new Font("Segoe UI", 10, FontStyle.Bold)
+        };
+        btnGenerateCaptions.Click += BtnGenerateCaptions_Click;
+        captionsPanel.Controls.Add(btnGenerateCaptions);
+        yPos += 60;
+
+        // Progress Bar
+        progressBarCaptions = new ProgressBar {
+            Location = new Point(10, yPos),
+            Size = new Size(900, 25),
+            Style = ProgressBarStyle.Marquee,
+            Visible = false
+        };
+        captionsPanel.Controls.Add(progressBarCaptions);
+        yPos += 35;
+
+        // Log
+        var lblCaptionsLog = new Label { Text = "Log:", Location = new Point(10, yPos), AutoSize = true };
+        captionsPanel.Controls.Add(lblCaptionsLog);
+        yPos += 25;
+
+        txtCaptionsLog = new TextBox {
+            Location = new Point(10, yPos),
+            Size = new Size(900, 300),
+            Multiline = true,
+            ScrollBars = ScrollBars.Vertical,
+            ReadOnly = true,
+            Font = new Font("Consola", 9)
+        };
+        captionsPanel.Controls.Add(txtCaptionsLog);
 
         // === SETTINGS TAB ===
         var settingsPanel = new Panel { Dock = DockStyle.Fill, Padding = new Padding(20) };
@@ -604,6 +703,7 @@ partial class MainForm
 
     private TabControl tabControl;
     private TabPage tabGenerate;
+    private TabPage tabCaptions;
     private TabPage tabSettings;
     private TabPage tabStatus;
     private TabPage tabDebug;
@@ -652,6 +752,17 @@ partial class MainForm
     private NumericUpDown numAudioBitrate;
     private ComboBox cmbAudioChannels;
     private Button btnSaveSettings;
+    
+    // Captions Tab Controls
+    private TextBox txtInputVideo;
+    private Button btnBrowseInputVideo;
+    private TextBox txtOutputVideo;
+    private Button btnBrowseOutputVideo;
+    private ComboBox cmbCaptionStyle;
+    private ComboBox cmbTranscriptionMethod;
+    private Button btnGenerateCaptions;
+    private ProgressBar progressBarCaptions;
+    private TextBox txtCaptionsLog;
     
     // Status Tab Controls
     private TextBox txtSystemStatus;

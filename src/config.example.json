@@ -1,8 +1,8 @@
 {
   "OllamaUrl": "http://localhost:11434",
   "OllamaModel": "llama3.1",
-  "PiperPath": "piper",
-  "PiperModelPath": "models/voice.onnx",
+  "PiperPath": "C:\\Tools\\piper\\piper.exe",
+  "PiperModelPath": "C:\\Tools\\piper\\models\\en_US-lessac-medium.onnx",
   "FFmpegPath": "ffmpeg",
   "DefaultOutputPath": "output",
   "UseGpuAcceleration": false,

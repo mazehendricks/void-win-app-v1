@@ -7,8 +7,8 @@ public class AppConfig
 {
     public string OllamaUrl { get; set; } = "http://localhost:11434";
     public string OllamaModel { get; set; } = "llama3.1";
-    public string PiperPath { get; set; } = "piper";
-    public string PiperModelPath { get; set; } = "models/voice.onnx";
+    public string PiperPath { get; set; } = "C:\\Tools\\piper\\piper.exe";
+    public string PiperModelPath { get; set; } = "C:\\Tools\\piper\\models\\en_US-lessac-medium.onnx";
     public string FFmpegPath { get; set; } = "ffmpeg";
     public string DefaultOutputPath { get; set; } = "output";
     

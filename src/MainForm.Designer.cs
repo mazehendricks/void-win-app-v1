@@ -1,5 +1,7 @@
 namespace VoidVideoGenerator;
 
+using VoidVideoGenerator.Models;
+
 partial class MainForm
 {
     /// <summary>

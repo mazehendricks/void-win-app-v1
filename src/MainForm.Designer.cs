@@ -235,6 +235,87 @@ partial class MainForm
         settingsPanel.Controls.Add(grpGpuSettings);
         yPos += 110;
 
+        // Video Output Settings Section
+        var grpVideoOutput = new GroupBox {
+            Text = "Video Output Settings",
+            Location = new Point(10, yPos),
+            Size = new Size(600, 180)
+        };
+
+        var lblResolution = new Label { Text = "Resolution:", Location = new Point(10, 25), AutoSize = true };
+        cmbResolution = new ComboBox {
+            Location = new Point(120, 22),
+            Size = new Size(150, 25),
+            DropDownStyle = ComboBoxStyle.DropDownList
+        };
+        cmbResolution.Items.AddRange(new object[] { "720p", "1080p", "1440p", "4K" });
+        cmbResolution.SelectedIndex = 1; // 1080p default
+
+        var lblQuality = new Label { Text = "Quality Preset:", Location = new Point(300, 25), AutoSize = true };
+        cmbQuality = new ComboBox {
+            Location = new Point(410, 22),
+            Size = new Size(150, 25),
+            DropDownStyle = ComboBoxStyle.DropDownList
+        };
+        cmbQuality.Items.AddRange(new object[] { "Low", "Medium", "High", "Ultra" });
+        cmbQuality.SelectedIndex = 1; // Medium default
+
+        var lblFrameRate = new Label { Text = "Frame Rate:", Location = new Point(10, 60), AutoSize = true };
+        cmbFrameRate = new ComboBox {
+            Location = new Point(120, 57),
+            Size = new Size(150, 25),
+            DropDownStyle = ComboBoxStyle.DropDownList
+        };
+        cmbFrameRate.Items.AddRange(new object[] { "24 fps", "30 fps", "60 fps" });
+        cmbFrameRate.SelectedIndex = 1; // 30 fps default
+
+        var lblVideoBitrate = new Label { Text = "Video Bitrate:", Location = new Point(300, 60), AutoSize = true };
+        numVideoBitrate = new NumericUpDown {
+            Location = new Point(410, 57),
+            Size = new Size(100, 25),
+            Minimum = 1000,
+            Maximum = 50000,
+            Value = 5000,
+            Increment = 500
+        };
+        var lblVideoBitrateUnit = new Label { Text = "kbps", Location = new Point(515, 60), AutoSize = true };
+
+        var lblAudioBitrate = new Label { Text = "Audio Bitrate:", Location = new Point(10, 95), AutoSize = true };
+        numAudioBitrate = new NumericUpDown {
+            Location = new Point(120, 92),
+            Size = new Size(100, 25),
+            Minimum = 64,
+            Maximum = 320,
+            Value = 192,
+            Increment = 32
+        };
+        var lblAudioBitrateUnit = new Label { Text = "kbps", Location = new Point(225, 95), AutoSize = true };
+
+        var lblAudioChannels = new Label { Text = "Audio Channels:", Location = new Point(300, 95), AutoSize = true };
+        cmbAudioChannels = new ComboBox {
+            Location = new Point(410, 92),
+            Size = new Size(150, 25),
+            DropDownStyle = ComboBoxStyle.DropDownList
+        };
+        cmbAudioChannels.Items.AddRange(new object[] { "Mono", "Stereo" });
+        cmbAudioChannels.SelectedIndex = 1; // Stereo default
+
+        var lblVideoInfo = new Label {
+            Text = "Higher settings = better quality but larger file sizes",
+            Location = new Point(10, 130),
+            Size = new Size(580, 40),
+            ForeColor = Color.DarkGreen
+        };
+
+        grpVideoOutput.Controls.AddRange(new Control[] {
+            lblResolution, cmbResolution, lblQuality, cmbQuality,
+            lblFrameRate, cmbFrameRate, lblVideoBitrate, numVideoBitrate, lblVideoBitrateUnit,
+            lblAudioBitrate, numAudioBitrate, lblAudioBitrateUnit,
+            lblAudioChannels, cmbAudioChannels, lblVideoInfo
+        });
+        settingsPanel.Controls.Add(grpVideoOutput);
+        yPos += 190;
+
         btnSaveSettings = new Button {
             Text = "Save Settings",
             Location = new Point(200, yPos),
@@ -376,6 +457,12 @@ partial class MainForm
     private TextBox txtFFmpegPath;
     private CheckBox chkUseGpu;
     private ComboBox cmbGpuEncoder;
+    private ComboBox cmbResolution;
+    private ComboBox cmbQuality;
+    private ComboBox cmbFrameRate;
+    private NumericUpDown numVideoBitrate;
+    private NumericUpDown numAudioBitrate;
+    private ComboBox cmbAudioChannels;
     private Button btnSaveSettings;
     
     // Status Tab Controls

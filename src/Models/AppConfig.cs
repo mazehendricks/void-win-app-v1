@@ -22,6 +22,11 @@ public class AppConfig
     /// </summary>
     public string GpuEncoder { get; set; } = "auto";
     
+    /// <summary>
+    /// Video output settings
+    /// </summary>
+    public VideoOutputSettings VideoSettings { get; set; } = new();
+    
     public ChannelDNA DefaultChannelDNA { get; set; } = new()
     {
         Niche = "Educational",

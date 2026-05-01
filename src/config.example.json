@@ -7,6 +7,19 @@
   "DefaultOutputPath": "output",
   "UseGpuAcceleration": false,
   "GpuEncoder": "auto",
+  "VideoSettings": {
+    "Resolution": "1080p",
+    "Width": 1920,
+    "Height": 1080,
+    "QualityPreset": "Medium",
+    "VideoBitrate": 5000,
+    "FrameRate": 30,
+    "VideoFormat": "mp4",
+    "VideoCodec": "h264",
+    "AudioBitrate": 192,
+    "AudioSampleRate": 48000,
+    "AudioChannels": "stereo"
+  },
   "DefaultChannelDNA": {
     "Niche": "Educational",
     "HostPersona": "Friendly expert",

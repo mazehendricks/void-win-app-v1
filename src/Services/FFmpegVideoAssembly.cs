@@ -11,12 +11,14 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
     private readonly string _ffmpegPath;
     private bool _useGpuAcceleration;
     private string _gpuEncoder;
+    private VideoOutputSettings _outputSettings;
 
-    public FFmpegVideoAssembly(string ffmpegPath = "ffmpeg", bool useGpuAcceleration = false, string gpuEncoder = "auto")
+    public FFmpegVideoAssembly(string ffmpegPath = "ffmpeg", bool useGpuAcceleration = false, string gpuEncoder = "auto", VideoOutputSettings? outputSettings = null)
     {
         _ffmpegPath = ffmpegPath;
         _useGpuAcceleration = useGpuAcceleration;
         _gpuEncoder = gpuEncoder;
+        _outputSettings = outputSettings ?? new VideoOutputSettings();
     }
 
     /// <summary>
@@ -26,6 +28,14 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
     {
         _useGpuAcceleration = enabled;
         _gpuEncoder = encoder;
+    }
+
+    /// <summary>
+    /// Set video output settings
+    /// </summary>
+    public void SetOutputSettings(VideoOutputSettings settings)
+    {
+        _outputSettings = settings;
     }
 
     public async Task<bool> IsAvailableAsync()
@@ -241,8 +251,10 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
 
         try
         {
-            // Build FFmpeg arguments based on GPU/CPU selection
+            // Build FFmpeg arguments based on settings
             string videoCodec = GetVideoCodecArguments();
+            string audioCodec = GetAudioCodecArguments();
+            string scaleFilter = GetScaleFilter();
             
             var process = new Process
             {
@@ -250,7 +262,7 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
                 {
                     FileName = _ffmpegPath,
                     Arguments = $"-f concat -safe 0 -i \"{inputFile}\" -i \"{audioPath}\" " +
-                                $"{videoCodec} -c:a aac -b:a 192k -pix_fmt yuv420p " +
+                                $"{scaleFilter}{videoCodec} {audioCodec} -pix_fmt yuv420p -r {_outputSettings.FrameRate} " +
                                 $"-shortest \"{outputPath}\"",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
@@ -287,14 +299,17 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
     }
 
     /// <summary>
-    /// Get video codec arguments based on GPU/CPU settings
+    /// Get video codec arguments based on GPU/CPU settings and output settings
     /// </summary>
     private string GetVideoCodecArguments()
     {
+        int bitrate = _outputSettings.VideoBitrate;
+        int maxrate = (int)(bitrate * 1.5);
+        
         if (!_useGpuAcceleration)
         {
             // CPU encoding with libx264
-            return "-c:v libx264 -tune stillimage -preset medium";
+            return $"-c:v libx264 -tune stillimage -preset medium -b:v {bitrate}k -maxrate {maxrate}k -bufsize {bitrate * 2}k";
         }
 
         // GPU encoding - determine encoder type
@@ -302,12 +317,34 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
         
         return encoder switch
         {
-            "h264_nvenc" => "-c:v h264_nvenc -preset p4 -tune hq -rc vbr -cq 23 -b:v 5M -maxrate 8M",
-            "h264_amf" => "-c:v h264_amf -quality quality -rc vbr_latency -qp_i 23 -qp_p 23",
-            "h264_qsv" => "-c:v h264_qsv -preset medium -global_quality 23",
-            "h264_videotoolbox" => "-c:v h264_videotoolbox -b:v 5M",
-            _ => "-c:v libx264 -tune stillimage -preset medium" // Fallback to CPU
+            "h264_nvenc" => $"-c:v h264_nvenc -preset p4 -tune hq -rc vbr -cq 23 -b:v {bitrate}k -maxrate {maxrate}k",
+            "h264_amf" => $"-c:v h264_amf -quality quality -rc vbr_latency -qp_i 23 -qp_p 23 -b:v {bitrate}k",
+            "h264_qsv" => $"-c:v h264_qsv -preset medium -global_quality 23 -b:v {bitrate}k",
+            "h264_videotoolbox" => $"-c:v h264_videotoolbox -b:v {bitrate}k",
+            _ => $"-c:v libx264 -tune stillimage -preset medium -b:v {bitrate}k -maxrate {maxrate}k" // Fallback to CPU
         };
+    }
+
+    /// <summary>
+    /// Get audio codec arguments based on output settings
+    /// </summary>
+    private string GetAudioCodecArguments()
+    {
+        int channels = _outputSettings.AudioChannels.ToLower() == "mono" ? 1 : 2;
+        return $"-c:a aac -b:a {_outputSettings.AudioBitrate}k -ar {_outputSettings.AudioSampleRate} -ac {channels}";
+    }
+
+    /// <summary>
+    /// Get scale filter for resolution
+    /// </summary>
+    private string GetScaleFilter()
+    {
+        // Only add scale filter if resolution is not 1920x1080 (default)
+        if (_outputSettings.Width != 1920 || _outputSettings.Height != 1080)
+        {
+            return $"-vf scale={_outputSettings.Width}:{_outputSettings.Height} ";
+        }
+        return "";
     }
 
     /// <summary>

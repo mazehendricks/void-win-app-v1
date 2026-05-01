@@ -83,7 +83,7 @@ public partial class MainForm : Form
         {
             _scriptGenerator = new OllamaScriptGenerator(_config.OllamaUrl, _config.OllamaModel);
             var voiceGenerator = new PiperTTSService(_config.PiperPath, _config.PiperModelPath);
-            _videoAssembly = new FFmpegVideoAssembly(_config.FFmpegPath, _config.UseGpuAcceleration, _config.GpuEncoder);
+            _videoAssembly = new FFmpegVideoAssembly(_config.FFmpegPath, _config.UseGpuAcceleration, _config.GpuEncoder, _config.VideoSettings);
 
             _pipeline = new VideoGenerationPipeline(_scriptGenerator, voiceGenerator, _videoAssembly);
             LogMessage("Services initialized");
@@ -92,6 +92,7 @@ public partial class MainForm : Form
             {
                 LogMessage($"GPU Encoder: {_config.GpuEncoder}");
             }
+            LogMessage($"Video Output: {_config.VideoSettings.Resolution} @ {_config.VideoSettings.FrameRate}fps, {_config.VideoSettings.QualityPreset} quality");
         }
         catch (Exception ex)
         {
@@ -109,6 +110,14 @@ public partial class MainForm : Form
         txtFFmpegPath.Text = _config.FFmpegPath;
         chkUseGpu.Checked = _config.UseGpuAcceleration;
         cmbGpuEncoder.SelectedItem = _config.GpuEncoder;
+
+        // Video output settings
+        cmbResolution.SelectedItem = _config.VideoSettings.Resolution;
+        cmbQuality.SelectedItem = _config.VideoSettings.QualityPreset;
+        cmbFrameRate.SelectedItem = $"{_config.VideoSettings.FrameRate} fps";
+        numVideoBitrate.Value = _config.VideoSettings.VideoBitrate;
+        numAudioBitrate.Value = _config.VideoSettings.AudioBitrate;
+        cmbAudioChannels.SelectedItem = _config.VideoSettings.AudioChannels == "mono" ? "Mono" : "Stereo";
 
         // Generate tab - Channel DNA defaults
         txtNiche.Text = _config.DefaultChannelDNA.Niche;
@@ -315,6 +324,14 @@ public partial class MainForm : Form
         _config.DefaultOutputPath = txtOutputPath.Text;
         _config.UseGpuAcceleration = chkUseGpu.Checked;
         _config.GpuEncoder = cmbGpuEncoder.SelectedItem?.ToString() ?? "auto";
+
+        // Video output settings
+        _config.VideoSettings.SetResolution(cmbResolution.SelectedItem?.ToString() ?? "1080p");
+        _config.VideoSettings.SetQualityPreset(cmbQuality.SelectedItem?.ToString() ?? "Medium");
+        _config.VideoSettings.FrameRate = int.Parse((cmbFrameRate.SelectedItem?.ToString() ?? "30 fps").Replace(" fps", ""));
+        _config.VideoSettings.VideoBitrate = (int)numVideoBitrate.Value;
+        _config.VideoSettings.AudioBitrate = (int)numAudioBitrate.Value;
+        _config.VideoSettings.AudioChannels = cmbAudioChannels.SelectedItem?.ToString()?.ToLower() ?? "stereo";
 
         _config.DefaultChannelDNA = new ChannelDNA
         {

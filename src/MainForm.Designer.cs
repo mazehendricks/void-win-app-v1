@@ -1,6 +1,7 @@
 namespace VoidVideoGenerator;
 
 using VoidVideoGenerator.Models;
+using VoidVideoGenerator.Components;
 
 partial class MainForm
 {
@@ -17,11 +18,13 @@ partial class MainForm
     /// </summary>
     private void InitializeComponent()
     {
-        // Main Form
+        // Main Form - Modern UI
         this.Text = "Void Video Generator - Local AI Video Creator";
         this.Size = new Size(1000, 700);
         this.StartPosition = FormStartPosition.CenterScreen;
         this.MinimumSize = new Size(800, 600);
+        this.BackColor = ModernTheme.Background;
+        this.ForeColor = ModernTheme.TextPrimary;
         
         // Set application icon
         try
@@ -196,22 +199,24 @@ partial class MainForm
         generatePanel.Controls.Add(grpVisuals);
         yPos += 130;
 
-        // Generate Button
-        btnGenerate = new Button {
-            Text = "Generate Video",
+        // Generate Button - Modern UI
+        btnGenerate = new ModernButton {
+            Text = "🎬 Generate Video",
             Location = new Point(10, yPos),
             Size = new Size(200, 40),
-            Font = new Font("Segoe UI", 12, FontStyle.Bold)
+            Style = ModernButton.ButtonStyle.Primary,
+            BorderRadius = BorderRadius.MD
         };
         btnGenerate.Click += BtnGenerate_Click;
         generatePanel.Controls.Add(btnGenerate);
 
-        // Progress
-        progressBar = new ProgressBar {
+        // Progress - Modern UI
+        progressBar = new ModernProgressBar {
             Location = new Point(220, yPos + 5),
             Size = new Size(690, 30),
-            Style = ProgressBarStyle.Marquee,
-            Visible = false
+            Visible = false,
+            ShowPercentage = true,
+            BarHeight = 30
         };
         generatePanel.Controls.Add(progressBar);
         yPos += 50;

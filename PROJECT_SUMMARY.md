@@ -1,4 +1,8 @@
-# Void Video Generator - Project Summary
+
+⚠ Piper not detected:
+  1. Download from: https://github.com/rhasspy/piper
+  2. Download a voice model (.onnx file)
+  3. Update paths in Settings tab# Void Video Generator - Project Summary
 
 ## 📋 Project Overview
 

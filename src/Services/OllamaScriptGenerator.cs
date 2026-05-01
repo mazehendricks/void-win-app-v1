@@ -28,7 +28,20 @@ public class OllamaScriptGenerator : IScriptGeneratorService
         try
         {
             var response = await _httpClient.GetAsync($"{_baseUrl}/api/tags");
-            return response.IsSuccessStatusCode;
+            if (!response.IsSuccessStatusCode)
+            {
+                return false;
+            }
+
+            // Verify the model is available
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var result = JsonSerializer.Deserialize<OllamaTagsResponse>(responseJson, options);
+            
+            // Check if our model is in the list
+            var modelAvailable = result?.Models?.Any(m => m.Name?.StartsWith(_model) == true) ?? false;
+            
+            return modelAvailable;
         }
         catch
         {
@@ -36,9 +49,73 @@ public class OllamaScriptGenerator : IScriptGeneratorService
         }
     }
 
+    /// <summary>
+    /// Get detailed status information for diagnostics
+    /// </summary>
+    public async Task<string> GetDiagnosticInfoAsync()
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync($"{_baseUrl}/api/tags");
+            if (!response.IsSuccessStatusCode)
+            {
+                return $"❌ Ollama not responding at {_baseUrl} (Status: {response.StatusCode})";
+            }
+
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var result = JsonSerializer.Deserialize<OllamaTagsResponse>(responseJson, options);
+
+            if (result?.Models == null || !result.Models.Any())
+            {
+                return $"⚠️ Ollama is running but no models are installed.\nRun: ollama pull {_model}";
+            }
+
+            var modelNames = string.Join(", ", result.Models.Select(m => m.Name));
+            var modelAvailable = result.Models.Any(m => m.Name?.StartsWith(_model) == true);
+
+            if (modelAvailable)
+            {
+                return $"✓ Ollama is ready\n  URL: {_baseUrl}\n  Model: {_model}\n  Available models: {modelNames}";
+            }
+            else
+            {
+                return $"⚠️ Model '{_model}' not found\n  Available models: {modelNames}\n  Run: ollama pull {_model}";
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            return $"❌ Cannot connect to Ollama at {_baseUrl}\n  Error: {ex.Message}\n  Make sure Ollama is running: ollama serve";
+        }
+        catch (Exception ex)
+        {
+            return $"❌ Error checking Ollama: {ex.Message}";
+        }
+    }
+
     public async Task<VideoScript> GenerateScriptAsync(VideoRequest request, IProgress<string>? progress = null)
     {
         progress?.Report("Generating script with local LLM...");
+        
+        // Pre-flight check: Verify Ollama is accessible
+        progress?.Report($"Checking Ollama connection at {_baseUrl}...");
+        try
+        {
+            var testResponse = await _httpClient.GetAsync($"{_baseUrl}/api/tags");
+            if (!testResponse.IsSuccessStatusCode)
+            {
+                throw new Exception($"Ollama is not responding properly at {_baseUrl}. Status: {testResponse.StatusCode}");
+            }
+            progress?.Report("✓ Ollama connection verified");
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new Exception($"Cannot connect to Ollama at {_baseUrl}. Make sure Ollama is running (ollama serve). Error: {ex.Message}");
+        }
+        catch (TaskCanceledException)
+        {
+            throw new Exception($"Connection to Ollama at {_baseUrl} timed out. Is Ollama running?");
+        }
 
         var systemPrompt = request.ChannelDNA.ToSystemPrompt();
         var userPrompt = $@"Create a {request.TargetDurationSeconds}-second video script about: {request.Topic}
@@ -70,16 +147,39 @@ Format the script with clear sections: HOOK, BODY, and CTA.";
         var json = JsonSerializer.Serialize(requestBody);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        progress?.Report("Waiting for LLM response...");
-        var response = await _httpClient.PostAsync($"{_baseUrl}/api/generate", content);
-        response.EnsureSuccessStatusCode();
-
-        var responseJson = await response.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<OllamaResponse>(responseJson);
-
-        if (result?.Response == null)
+        progress?.Report($"Sending request to Ollama (model: {_model})...");
+        progress?.Report($"Prompt length: {json.Length} bytes");
+        progress?.Report("Waiting for LLM response (this may take 1-5 minutes)...");
+        
+        OllamaResponse result;
+        try
         {
-            throw new Exception("Failed to generate script from LLM");
+            var response = await _httpClient.PostAsync($"{_baseUrl}/api/generate", content);
+            response.EnsureSuccessStatusCode();
+
+            var responseJson = await response.Content.ReadAsStringAsync();
+            progress?.Report($"Received response ({responseJson.Length} chars), parsing...");
+            
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            result = JsonSerializer.Deserialize<OllamaResponse>(responseJson, options)!;
+
+            if (result?.Response == null)
+            {
+                throw new Exception($"Failed to generate script from LLM. Response: {responseJson.Substring(0, Math.Min(200, responseJson.Length))}");
+            }
+            
+            progress?.Report($"Script generated successfully ({result.Response.Length} chars)");
+        }
+        catch (TaskCanceledException)
+        {
+            throw new Exception("LLM request timed out. The model might be too slow or not responding.");
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new Exception($"Failed to connect to Ollama at {_baseUrl}: {ex.Message}");
         }
 
         progress?.Report("Parsing script...");
@@ -176,5 +276,16 @@ Format the script with clear sections: HOOK, BODY, and CTA.";
     private class OllamaResponse
     {
         public string? Response { get; set; }
+    }
+
+    private class OllamaTagsResponse
+    {
+        public List<OllamaModel>? Models { get; set; }
+    }
+
+    private class OllamaModel
+    {
+        public string? Name { get; set; }
+        public long Size { get; set; }
     }
 }

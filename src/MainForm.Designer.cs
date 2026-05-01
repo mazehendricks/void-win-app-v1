@@ -38,14 +38,16 @@ partial class MainForm
         tabControl = new TabControl();
         tabControl.Dock = DockStyle.Fill;
         
-        // Tab 1: Video Generation
+        // Tabs
         tabGenerate = new TabPage("Generate Video");
         tabSettings = new TabPage("Settings");
         tabStatus = new TabPage("System Status");
+        tabDebug = new TabPage("Debug Console");
         
         tabControl.TabPages.Add(tabGenerate);
         tabControl.TabPages.Add(tabSettings);
         tabControl.TabPages.Add(tabStatus);
+        tabControl.TabPages.Add(tabDebug);
 
         // === GENERATE TAB ===
         var generatePanel = new Panel { Dock = DockStyle.Fill, Padding = new Padding(20) };
@@ -227,13 +229,70 @@ partial class MainForm
         };
         statusPanel.Controls.Add(txtSystemStatus);
 
-        btnCheckStatus = new Button { 
-            Text = "Check System Status", 
-            Location = new Point(10, 450), 
-            Size = new Size(200, 35) 
+        btnCheckStatus = new Button {
+            Text = "Check System Status",
+            Location = new Point(10, 450),
+            Size = new Size(200, 35)
         };
         btnCheckStatus.Click += BtnCheckStatus_Click;
         statusPanel.Controls.Add(btnCheckStatus);
+
+        // === DEBUG CONSOLE TAB ===
+        var debugPanel = new Panel { Dock = DockStyle.Fill, Padding = new Padding(20) };
+        tabDebug.Controls.Add(debugPanel);
+
+        var lblDebugTitle = new Label {
+            Text = "Ollama Server Console - Live Output",
+            Location = new Point(10, 10),
+            AutoSize = true,
+            Font = new Font("Segoe UI", 10, FontStyle.Bold)
+        };
+        debugPanel.Controls.Add(lblDebugTitle);
+
+        txtOllamaConsole = new TextBox {
+            Location = new Point(10, 40),
+            Size = new Size(900, 400),
+            Multiline = true,
+            ScrollBars = ScrollBars.Vertical,
+            ReadOnly = true,
+            BackColor = Color.Black,
+            ForeColor = Color.LimeGreen,
+            Font = new Font("Consolas", 9)
+        };
+        debugPanel.Controls.Add(txtOllamaConsole);
+
+        var buttonPanel = new FlowLayoutPanel {
+            Location = new Point(10, 450),
+            Size = new Size(900, 40),
+            FlowDirection = FlowDirection.LeftToRight
+        };
+
+        btnStartOllama = new Button {
+            Text = "Start Ollama Server",
+            Size = new Size(150, 35),
+            Margin = new Padding(0, 0, 10, 0)
+        };
+        btnStartOllama.Click += BtnStartOllama_Click;
+        buttonPanel.Controls.Add(btnStartOllama);
+
+        btnStopOllama = new Button {
+            Text = "Stop Ollama Server",
+            Size = new Size(150, 35),
+            Enabled = false,
+            Margin = new Padding(0, 0, 10, 0)
+        };
+        btnStopOllama.Click += BtnStopOllama_Click;
+        buttonPanel.Controls.Add(btnStopOllama);
+
+        btnClearConsole = new Button {
+            Text = "Clear Console",
+            Size = new Size(120, 35),
+            Margin = new Padding(0, 0, 10, 0)
+        };
+        btnClearConsole.Click += BtnClearConsole_Click;
+        buttonPanel.Controls.Add(btnClearConsole);
+
+        debugPanel.Controls.Add(buttonPanel);
 
         // Add tab control to form
         this.Controls.Add(tabControl);
@@ -245,6 +304,7 @@ partial class MainForm
     private TabPage tabGenerate;
     private TabPage tabSettings;
     private TabPage tabStatus;
+    private TabPage tabDebug;
     
     // Generate Tab Controls
     private TextBox txtTitle;
@@ -272,4 +332,10 @@ partial class MainForm
     // Status Tab Controls
     private TextBox txtSystemStatus;
     private Button btnCheckStatus;
+    
+    // Debug Console Tab Controls
+    private TextBox txtOllamaConsole;
+    private Button btnStartOllama;
+    private Button btnStopOllama;
+    private Button btnClearConsole;
 }

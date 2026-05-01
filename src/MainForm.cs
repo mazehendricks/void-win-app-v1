@@ -9,6 +9,7 @@ public partial class MainForm : Form
     private AppConfig _config;
     private VideoGenerationPipeline? _pipeline;
     private readonly string _configPath = "config.json";
+    private System.Diagnostics.Process? _ollamaProcess;
 
     public MainForm()
     {
@@ -16,6 +17,22 @@ public partial class MainForm : Form
         LoadConfiguration();
         InitializeServices();
         PopulateFormFromConfig();
+        CheckOllamaRunning();
+    }
+
+    protected override void OnFormClosing(FormClosingEventArgs e)
+    {
+        base.OnFormClosing(e);
+        // Stop Ollama if we started it
+        if (_ollamaProcess != null && !_ollamaProcess.HasExited)
+        {
+            try
+            {
+                _ollamaProcess.Kill();
+                _ollamaProcess.Dispose();
+            }
+            catch { }
+        }
     }
 
     private void LoadConfiguration()
@@ -57,15 +74,17 @@ public partial class MainForm : Form
         }
     }
 
+    private OllamaScriptGenerator? _scriptGenerator;
+    
     private void InitializeServices()
     {
         try
         {
-            var scriptGenerator = new OllamaScriptGenerator(_config.OllamaUrl, _config.OllamaModel);
+            _scriptGenerator = new OllamaScriptGenerator(_config.OllamaUrl, _config.OllamaModel);
             var voiceGenerator = new PiperTTSService(_config.PiperPath, _config.PiperModelPath);
             var videoAssembly = new FFmpegVideoAssembly(_config.FFmpegPath);
 
-            _pipeline = new VideoGenerationPipeline(scriptGenerator, voiceGenerator, videoAssembly);
+            _pipeline = new VideoGenerationPipeline(_scriptGenerator, voiceGenerator, videoAssembly);
             LogMessage("Services initialized");
         }
         catch (Exception ex)
@@ -217,6 +236,14 @@ public partial class MainForm : Form
                 txtSystemStatus.AppendText($"{statusIcon} {service.Key}: {statusText}\r\n");
             }
 
+            // Get detailed Ollama diagnostics
+            if (_scriptGenerator != null)
+            {
+                txtSystemStatus.AppendText("\r\n=== OLLAMA DIAGNOSTICS ===\r\n\r\n");
+                var ollamaDiag = await _scriptGenerator.GetDiagnosticInfoAsync();
+                txtSystemStatus.AppendText($"{ollamaDiag}\r\n");
+            }
+
             txtSystemStatus.AppendText("\r\n=== CONFIGURATION ===\r\n\r\n");
             txtSystemStatus.AppendText($"Ollama URL: {_config.OllamaUrl}\r\n");
             txtSystemStatus.AppendText($"Ollama Model: {_config.OllamaModel}\r\n");
@@ -230,7 +257,8 @@ public partial class MainForm : Form
             {
                 txtSystemStatus.AppendText("⚠ Ollama not detected:\r\n");
                 txtSystemStatus.AppendText("  1. Download from: https://ollama.com\r\n");
-                txtSystemStatus.AppendText("  2. Install and run: ollama pull llama3.1\r\n\r\n");
+                txtSystemStatus.AppendText("  2. Install and run: ollama serve\r\n");
+                txtSystemStatus.AppendText("  3. Pull a model: ollama pull llama3.1\r\n\r\n");
             }
 
             if (!status["Piper (TTS)"])
@@ -256,6 +284,7 @@ public partial class MainForm : Form
             else
             {
                 txtSystemStatus.AppendText("\r\n⚠ Some services are not available. Please install missing components.\r\n");
+                txtSystemStatus.AppendText("See TROUBLESHOOTING.md for detailed help.\r\n");
             }
         }
         catch (Exception ex)
@@ -305,5 +334,152 @@ public partial class MainForm : Form
     {
         var invalid = Path.GetInvalidFileNameChars();
         return string.Join("_", fileName.Split(invalid, StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
+    }
+
+    // === DEBUG CONSOLE METHODS ===
+
+    private void CheckOllamaRunning()
+    {
+        Task.Run(async () =>
+        {
+            try
+            {
+                using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
+                var response = await client.GetAsync("http://localhost:11434/api/tags");
+                
+                if (InvokeRequired)
+                {
+                    Invoke(() =>
+                    {
+                        if (response.IsSuccessStatusCode)
+                        {
+                            AppendConsole("✓ Ollama server is already running");
+                            btnStartOllama.Enabled = false;
+                            btnStopOllama.Enabled = false; // External process
+                        }
+                        else
+                        {
+                            AppendConsole("⚠ Ollama server not detected");
+                        }
+                    });
+                }
+            }
+            catch
+            {
+                if (InvokeRequired)
+                {
+                    Invoke(() => AppendConsole("⚠ Ollama server not detected - Click 'Start Ollama Server' to launch"));
+                }
+            }
+        });
+    }
+
+    private void BtnStartOllama_Click(object? sender, EventArgs e)
+    {
+        try
+        {
+            AppendConsole("=== Starting Ollama Server ===");
+            AppendConsole($"Time: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+            AppendConsole("");
+
+            var startInfo = new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "ollama",
+                Arguments = "serve",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            };
+
+            _ollamaProcess = new System.Diagnostics.Process { StartInfo = startInfo };
+
+            // Capture output
+            _ollamaProcess.OutputDataReceived += (s, args) =>
+            {
+                if (!string.IsNullOrEmpty(args.Data))
+                {
+                    AppendConsole($"[OUT] {args.Data}");
+                }
+            };
+
+            _ollamaProcess.ErrorDataReceived += (s, args) =>
+            {
+                if (!string.IsNullOrEmpty(args.Data))
+                {
+                    AppendConsole($"[ERR] {args.Data}");
+                }
+            };
+
+            _ollamaProcess.Start();
+            _ollamaProcess.BeginOutputReadLine();
+            _ollamaProcess.BeginErrorReadLine();
+
+            btnStartOllama.Enabled = false;
+            btnStopOllama.Enabled = true;
+
+            AppendConsole("✓ Ollama server started successfully");
+            AppendConsole("Listening on http://localhost:11434");
+            AppendConsole("");
+        }
+        catch (Exception ex)
+        {
+            AppendConsole($"✗ Failed to start Ollama: {ex.Message}");
+            AppendConsole("");
+            AppendConsole("Make sure Ollama is installed:");
+            AppendConsole("  Download from: https://ollama.com");
+            AppendConsole("  Or run manually: ollama serve");
+            MessageBox.Show($"Failed to start Ollama:\n\n{ex.Message}\n\nMake sure Ollama is installed.",
+                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private void BtnStopOllama_Click(object? sender, EventArgs e)
+    {
+        try
+        {
+            if (_ollamaProcess != null && !_ollamaProcess.HasExited)
+            {
+                AppendConsole("");
+                AppendConsole("=== Stopping Ollama Server ===");
+                _ollamaProcess.Kill();
+                _ollamaProcess.Dispose();
+                _ollamaProcess = null;
+
+                btnStartOllama.Enabled = true;
+                btnStopOllama.Enabled = false;
+
+                AppendConsole("✓ Ollama server stopped");
+                AppendConsole("");
+            }
+        }
+        catch (Exception ex)
+        {
+            AppendConsole($"✗ Error stopping Ollama: {ex.Message}");
+            MessageBox.Show($"Error stopping Ollama:\n\n{ex.Message}",
+                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private void BtnClearConsole_Click(object? sender, EventArgs e)
+    {
+        txtOllamaConsole.Clear();
+        AppendConsole("=== Console Cleared ===");
+        AppendConsole($"Time: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+        AppendConsole("");
+    }
+
+    private void AppendConsole(string message)
+    {
+        if (InvokeRequired)
+        {
+            Invoke(() => AppendConsole(message));
+            return;
+        }
+
+        var timestamp = DateTime.Now.ToString("HH:mm:ss");
+        txtOllamaConsole.AppendText($"[{timestamp}] {message}\r\n");
+        txtOllamaConsole.SelectionStart = txtOllamaConsole.Text.Length;
+        txtOllamaConsole.ScrollToCaret();
     }
 }

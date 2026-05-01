@@ -1,6 +1,13 @@
 {
+  "AiProvider": "ollama",
   "OllamaUrl": "http://localhost:11434",
   "OllamaModel": "llama3.1",
+  "OpenAiApiKey": "",
+  "OpenAiModel": "gpt-4",
+  "AnthropicApiKey": "",
+  "AnthropicModel": "claude-3-5-sonnet-20241022",
+  "GeminiApiKey": "",
+  "GeminiModel": "gemini-1.5-pro",
   "PiperPath": "C:\\Tools\\piper\\piper.exe",
   "PiperModelPath": "C:\\Tools\\piper\\models\\voice.onnx",
   "FFmpegPath": "ffmpeg",

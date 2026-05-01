@@ -77,14 +77,17 @@ public partial class MainForm : Form
         }
     }
 
-    private OllamaScriptGenerator? _scriptGenerator;
+    private IScriptGeneratorService? _scriptGenerator;
     private FFmpegVideoAssembly? _videoAssembly;
     
     protected override void Dispose(bool disposing)
     {
         if (disposing)
         {
-            _scriptGenerator?.Dispose();
+            if (_scriptGenerator is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
             _ollamaProcess?.Dispose();
             components?.Dispose();
         }
@@ -95,12 +98,15 @@ public partial class MainForm : Form
     {
         try
         {
-            _scriptGenerator = new OllamaScriptGenerator(_config.OllamaUrl, _config.OllamaModel);
+            // Initialize script generator based on AI provider
+            _scriptGenerator = CreateScriptGenerator();
+            
             var voiceGenerator = new PiperTTSService(_config.PiperPath, _config.PiperModelPath);
             _videoAssembly = new FFmpegVideoAssembly(_config.FFmpegPath, _config.UseGpuAcceleration, _config.GpuEncoder, _config.VideoSettings);
 
             _pipeline = new VideoGenerationPipeline(_scriptGenerator, voiceGenerator, _videoAssembly);
             LogMessage("Services initialized");
+            LogMessage($"AI Provider: {_config.AiProvider.ToUpper()}");
             LogMessage($"GPU Acceleration: {(_config.UseGpuAcceleration ? "Enabled" : "Disabled")}");
             if (_config.UseGpuAcceleration)
             {
@@ -114,11 +120,64 @@ public partial class MainForm : Form
         }
     }
 
+    private IScriptGeneratorService CreateScriptGenerator()
+    {
+        var provider = _config.AiProvider.ToLower();
+        
+        switch (provider)
+        {
+            case "openai":
+                if (string.IsNullOrEmpty(_config.OpenAiApiKey))
+                {
+                    throw new Exception("OpenAI API key is not configured. Please add it to config.json");
+                }
+                LogMessage($"Using OpenAI ({_config.OpenAiModel})");
+                return new OpenAIScriptGenerator(_config.OpenAiApiKey, _config.OpenAiModel);
+            
+            case "anthropic":
+            case "claude":
+                if (string.IsNullOrEmpty(_config.AnthropicApiKey))
+                {
+                    throw new Exception("Anthropic API key is not configured. Please add it to config.json");
+                }
+                LogMessage($"Using Anthropic Claude ({_config.AnthropicModel})");
+                return new AnthropicScriptGenerator(_config.AnthropicApiKey, _config.AnthropicModel);
+            
+            case "gemini":
+            case "google":
+                if (string.IsNullOrEmpty(_config.GeminiApiKey))
+                {
+                    throw new Exception("Gemini API key is not configured. Please add it to config.json");
+                }
+                LogMessage($"Using Google Gemini ({_config.GeminiModel})");
+                return new GeminiScriptGenerator(_config.GeminiApiKey, _config.GeminiModel);
+            
+            case "ollama":
+            default:
+                LogMessage($"Using Ollama ({_config.OllamaModel})");
+                return new OllamaScriptGenerator(_config.OllamaUrl, _config.OllamaModel);
+        }
+    }
+
     private void PopulateFormFromConfig()
     {
-        // Settings tab
+        // Settings tab - AI Provider
+        cmbAiProvider.SelectedIndex = _config.AiProvider.ToLower() switch
+        {
+            "openai" => 1,
+            "anthropic" or "claude" => 2,
+            "gemini" or "google" => 3,
+            _ => 0 // Ollama
+        };
+        
         txtOllamaUrl.Text = _config.OllamaUrl;
         txtOllamaModel.Text = _config.OllamaModel;
+        txtOpenAiApiKey.Text = _config.OpenAiApiKey;
+        txtOpenAiModel.Text = _config.OpenAiModel;
+        txtAnthropicApiKey.Text = _config.AnthropicApiKey;
+        txtAnthropicModel.Text = _config.AnthropicModel;
+        txtGeminiApiKey.Text = _config.GeminiApiKey;
+        txtGeminiModel.Text = _config.GeminiModel;
         txtPiperPath.Text = _config.PiperPath;
         txtPiperModel.Text = _config.PiperModelPath;
         txtFFmpegPath.Text = _config.FFmpegPath;
@@ -478,8 +537,23 @@ public partial class MainForm : Form
 
     private void BtnSaveSettings_Click(object? sender, EventArgs e)
     {
+        // AI Provider settings
+        _config.AiProvider = cmbAiProvider.SelectedIndex switch
+        {
+            1 => "openai",
+            2 => "anthropic",
+            3 => "gemini",
+            _ => "ollama"
+        };
+        
         _config.OllamaUrl = txtOllamaUrl.Text;
         _config.OllamaModel = txtOllamaModel.Text;
+        _config.OpenAiApiKey = txtOpenAiApiKey.Text;
+        _config.OpenAiModel = txtOpenAiModel.Text;
+        _config.AnthropicApiKey = txtAnthropicApiKey.Text;
+        _config.AnthropicModel = txtAnthropicModel.Text;
+        _config.GeminiApiKey = txtGeminiApiKey.Text;
+        _config.GeminiModel = txtGeminiModel.Text;
         _config.PiperPath = txtPiperPath.Text;
         _config.PiperModelPath = txtPiperModel.Text;
         _config.FFmpegPath = txtFFmpegPath.Text;
@@ -764,5 +838,16 @@ public partial class MainForm : Form
         txtOllamaConsole.AppendText($"[{timestamp}] {message}\r\n");
         txtOllamaConsole.SelectionStart = txtOllamaConsole.Text.Length;
         txtOllamaConsole.ScrollToCaret();
+    }
+
+    private void CmbAiProvider_SelectedIndexChanged(object? sender, EventArgs e)
+    {
+        // Show/hide relevant fields based on selected provider
+        // This provides visual feedback about which settings are active
+        var selectedIndex = cmbAiProvider.SelectedIndex;
+        
+        // You could add visual indicators here if desired
+        // For now, all fields remain visible for easy configuration
+        LogMessage($"AI Provider changed to: {cmbAiProvider.SelectedItem}");
     }
 }

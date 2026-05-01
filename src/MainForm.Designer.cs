@@ -224,17 +224,82 @@ partial class MainForm
         tabSettings.Controls.Add(settingsPanel);
 
         yPos = 10;
-        var lblOllamaUrl = new Label { Text = "Ollama URL:", Location = new Point(10, yPos), AutoSize = true };
-        txtOllamaUrl = new TextBox { Location = new Point(200, yPos), Size = new Size(400, 25) };
-        settingsPanel.Controls.Add(lblOllamaUrl);
-        settingsPanel.Controls.Add(txtOllamaUrl);
-        yPos += 35;
+        
+        // AI Provider Selection
+        var grpAiProvider = new GroupBox {
+            Text = "AI Script Generator",
+            Location = new Point(10, yPos),
+            Size = new Size(600, 280)
+        };
+        
+        var lblAiProvider = new Label { Text = "Provider:", Location = new Point(10, 25), AutoSize = true };
+        cmbAiProvider = new ComboBox {
+            Location = new Point(100, 22),
+            Size = new Size(200, 25),
+            DropDownStyle = ComboBoxStyle.DropDownList
+        };
+        cmbAiProvider.Items.AddRange(new object[] { "Ollama (Local)", "OpenAI", "Anthropic Claude", "Google Gemini" });
+        cmbAiProvider.SelectedIndex = 0;
+        cmbAiProvider.SelectedIndexChanged += CmbAiProvider_SelectedIndexChanged;
+        
+        grpAiProvider.Controls.Add(lblAiProvider);
+        grpAiProvider.Controls.Add(cmbAiProvider);
+        
+        int aiYPos = 55;
+        
+        // Ollama Settings
+        var lblOllamaUrl = new Label { Text = "Ollama URL:", Location = new Point(10, aiYPos), AutoSize = true };
+        txtOllamaUrl = new TextBox { Location = new Point(150, aiYPos), Size = new Size(430, 25) };
+        grpAiProvider.Controls.Add(lblOllamaUrl);
+        grpAiProvider.Controls.Add(txtOllamaUrl);
+        aiYPos += 30;
 
-        var lblOllamaModel = new Label { Text = "Ollama Model:", Location = new Point(10, yPos), AutoSize = true };
-        txtOllamaModel = new TextBox { Location = new Point(200, yPos), Size = new Size(400, 25) };
-        settingsPanel.Controls.Add(lblOllamaModel);
-        settingsPanel.Controls.Add(txtOllamaModel);
-        yPos += 35;
+        var lblOllamaModel = new Label { Text = "Ollama Model:", Location = new Point(10, aiYPos), AutoSize = true };
+        txtOllamaModel = new TextBox { Location = new Point(150, aiYPos), Size = new Size(430, 25) };
+        grpAiProvider.Controls.Add(lblOllamaModel);
+        grpAiProvider.Controls.Add(txtOllamaModel);
+        aiYPos += 35;
+        
+        // OpenAI Settings
+        var lblOpenAiKey = new Label { Text = "OpenAI API Key:", Location = new Point(10, aiYPos), AutoSize = true };
+        txtOpenAiApiKey = new TextBox { Location = new Point(150, aiYPos), Size = new Size(430, 25), UseSystemPasswordChar = true };
+        grpAiProvider.Controls.Add(lblOpenAiKey);
+        grpAiProvider.Controls.Add(txtOpenAiApiKey);
+        aiYPos += 30;
+        
+        var lblOpenAiModel = new Label { Text = "OpenAI Model:", Location = new Point(10, aiYPos), AutoSize = true };
+        txtOpenAiModel = new TextBox { Location = new Point(150, aiYPos), Size = new Size(430, 25), Text = "gpt-4" };
+        grpAiProvider.Controls.Add(lblOpenAiModel);
+        grpAiProvider.Controls.Add(txtOpenAiModel);
+        aiYPos += 35;
+        
+        // Anthropic Settings
+        var lblAnthropicKey = new Label { Text = "Anthropic API Key:", Location = new Point(10, aiYPos), AutoSize = true };
+        txtAnthropicApiKey = new TextBox { Location = new Point(150, aiYPos), Size = new Size(430, 25), UseSystemPasswordChar = true };
+        grpAiProvider.Controls.Add(lblAnthropicKey);
+        grpAiProvider.Controls.Add(txtAnthropicApiKey);
+        aiYPos += 30;
+        
+        var lblAnthropicModel = new Label { Text = "Anthropic Model:", Location = new Point(10, aiYPos), AutoSize = true };
+        txtAnthropicModel = new TextBox { Location = new Point(150, aiYPos), Size = new Size(430, 25), Text = "claude-3-5-sonnet-20241022" };
+        grpAiProvider.Controls.Add(lblAnthropicModel);
+        grpAiProvider.Controls.Add(txtAnthropicModel);
+        aiYPos += 35;
+        
+        // Gemini Settings
+        var lblGeminiKey = new Label { Text = "Gemini API Key:", Location = new Point(10, aiYPos), AutoSize = true };
+        txtGeminiApiKey = new TextBox { Location = new Point(150, aiYPos), Size = new Size(430, 25), UseSystemPasswordChar = true };
+        grpAiProvider.Controls.Add(lblGeminiKey);
+        grpAiProvider.Controls.Add(txtGeminiApiKey);
+        aiYPos += 30;
+        
+        var lblGeminiModel = new Label { Text = "Gemini Model:", Location = new Point(10, aiYPos), AutoSize = true };
+        txtGeminiModel = new TextBox { Location = new Point(150, aiYPos), Size = new Size(430, 25), Text = "gemini-1.5-pro" };
+        grpAiProvider.Controls.Add(lblGeminiModel);
+        grpAiProvider.Controls.Add(txtGeminiModel);
+        
+        settingsPanel.Controls.Add(grpAiProvider);
+        yPos += 290;
 
         var lblPiperPath = new Label { Text = "Piper Path:", Location = new Point(10, yPos), AutoSize = true };
         txtPiperPath = new TextBox { Location = new Point(200, yPos), Size = new Size(400, 25) };
@@ -563,8 +628,15 @@ partial class MainForm
     private TextBox txtLog;
     
     // Settings Tab Controls
+    private ComboBox cmbAiProvider;
     private TextBox txtOllamaUrl;
     private TextBox txtOllamaModel;
+    private TextBox txtOpenAiApiKey;
+    private TextBox txtOpenAiModel;
+    private TextBox txtAnthropicApiKey;
+    private TextBox txtAnthropicModel;
+    private TextBox txtGeminiApiKey;
+    private TextBox txtGeminiModel;
     private TextBox txtPiperPath;
     private TextBox txtPiperModel;
     private TextBox txtFFmpegPath;

@@ -5,8 +5,26 @@ namespace VoidVideoGenerator.Models;
 /// </summary>
 public class AppConfig
 {
+    // AI Model Provider Selection
+    public string AiProvider { get; set; } = "ollama"; // ollama, openai, anthropic, gemini
+    
+    // Ollama Settings (Local)
     public string OllamaUrl { get; set; } = "http://localhost:11434";
     public string OllamaModel { get; set; } = "llama3.1";
+    
+    // OpenAI Settings
+    public string OpenAiApiKey { get; set; } = "";
+    public string OpenAiModel { get; set; } = "gpt-4";
+    
+    // Anthropic Settings
+    public string AnthropicApiKey { get; set; } = "";
+    public string AnthropicModel { get; set; } = "claude-3-5-sonnet-20241022";
+    
+    // Google Gemini Settings
+    public string GeminiApiKey { get; set; } = "";
+    public string GeminiModel { get; set; } = "gemini-1.5-pro";
+    
+    // TTS and Video Tools
     public string PiperPath { get; set; } = "C:\\Tools\\piper\\piper.exe";
     public string PiperModelPath { get; set; } = "C:\\Tools\\piper\\models\\voice.onnx";
     public string FFmpegPath { get; set; } = "ffmpeg";

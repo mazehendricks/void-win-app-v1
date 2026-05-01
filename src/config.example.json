@@ -17,6 +17,9 @@
   "GpuEncoder": "auto",
   "UnsplashApiKey": "",
   "UseUnsplashImages": false,
+  "WhisperPath": "whisper",
+  "WhisperModel": "base",
+  "UseWhisperApi": false,
   "VideoSettings": {
     "Resolution": "1080p",
     "Width": 1920,

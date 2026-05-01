@@ -606,6 +606,132 @@ partial class MainForm
             ForeColor = Color.DarkBlue
         };
         settingsPanel.Controls.Add(lblGpuInfo);
+        yPos += 100;
+
+        // Animation Settings Section
+        var grpAnimationSettings = new GroupBox {
+            Text = "Video Animation Settings",
+            Location = new Point(10, yPos),
+            Size = new Size(600, 180)
+        };
+        
+        int animYPos = 25;
+        
+        chkEnableKenBurns = new CheckBox {
+            Text = "Enable Ken Burns Effect (zoom/pan on images)",
+            Location = new Point(10, animYPos),
+            Size = new Size(580, 20),
+            Checked = true
+        };
+        grpAnimationSettings.Controls.Add(chkEnableKenBurns);
+        animYPos += 30;
+        
+        chkEnableCrossfade = new CheckBox {
+            Text = "Enable Crossfade Transitions between images",
+            Location = new Point(10, animYPos),
+            Size = new Size(580, 20),
+            Checked = true
+        };
+        grpAnimationSettings.Controls.Add(chkEnableCrossfade);
+        animYPos += 30;
+        
+        var lblTransitionDuration = new Label {
+            Text = "Transition Duration (seconds):",
+            Location = new Point(10, animYPos + 3),
+            AutoSize = true
+        };
+        numTransitionDuration = new NumericUpDown {
+            Location = new Point(220, animYPos),
+            Size = new Size(80, 25),
+            Minimum = 0.1m,
+            Maximum = 5.0m,
+            DecimalPlaces = 1,
+            Increment = 0.1m,
+            Value = 1.0m
+        };
+        grpAnimationSettings.Controls.Add(lblTransitionDuration);
+        grpAnimationSettings.Controls.Add(numTransitionDuration);
+        animYPos += 35;
+        
+        var lblZoomIntensity = new Label {
+            Text = "Zoom Intensity (1.0 = no zoom, 1.5 = 50% zoom):",
+            Location = new Point(10, animYPos + 3),
+            AutoSize = true
+        };
+        numZoomIntensity = new NumericUpDown {
+            Location = new Point(320, animYPos),
+            Size = new Size(80, 25),
+            Minimum = 1.0m,
+            Maximum = 2.0m,
+            DecimalPlaces = 1,
+            Increment = 0.1m,
+            Value = 1.2m
+        };
+        grpAnimationSettings.Controls.Add(lblZoomIntensity);
+        grpAnimationSettings.Controls.Add(numZoomIntensity);
+        
+        settingsPanel.Controls.Add(grpAnimationSettings);
+        yPos += 190;
+
+        // Whisper Settings Section
+        var grpWhisperSettings = new GroupBox {
+            Text = "Whisper (Caption) Settings",
+            Location = new Point(10, yPos),
+            Size = new Size(600, 140)
+        };
+        
+        int whisperYPos = 25;
+        
+        var lblWhisperPath = new Label {
+            Text = "Whisper Command:",
+            Location = new Point(10, whisperYPos + 3),
+            AutoSize = true
+        };
+        txtWhisperPath = new TextBox {
+            Location = new Point(150, whisperYPos),
+            Size = new Size(430, 25),
+            Text = "whisper"
+        };
+        grpWhisperSettings.Controls.Add(lblWhisperPath);
+        grpWhisperSettings.Controls.Add(txtWhisperPath);
+        whisperYPos += 35;
+        
+        var lblWhisperModel = new Label {
+            Text = "Whisper Model:",
+            Location = new Point(10, whisperYPos + 3),
+            AutoSize = true
+        };
+        cmbWhisperModel = new ComboBox {
+            Location = new Point(150, whisperYPos),
+            Size = new Size(200, 25),
+            DropDownStyle = ComboBoxStyle.DropDownList
+        };
+        cmbWhisperModel.Items.AddRange(new object[] { "tiny", "base", "small", "medium", "large" });
+        cmbWhisperModel.SelectedIndex = 1; // base
+        grpWhisperSettings.Controls.Add(lblWhisperModel);
+        grpWhisperSettings.Controls.Add(cmbWhisperModel);
+        whisperYPos += 35;
+        
+        chkUseWhisperApi = new CheckBox {
+            Text = "Use OpenAI Whisper API (requires OpenAI API key above)",
+            Location = new Point(10, whisperYPos),
+            Size = new Size(580, 20),
+            Checked = false
+        };
+        grpWhisperSettings.Controls.Add(chkUseWhisperApi);
+        
+        settingsPanel.Controls.Add(grpWhisperSettings);
+        yPos += 150;
+
+        // Save Settings Button
+        btnSaveSettings = new Button {
+            Text = "Save All Settings",
+            Location = new Point(10, yPos),
+            Size = new Size(200, 40),
+            Font = new Font("Segoe UI", 10, FontStyle.Bold)
+        };
+        btnSaveSettings.Click += BtnSaveSettings_Click;
+        settingsPanel.Controls.Add(btnSaveSettings);
 
         // === STATUS TAB ===
         var statusPanel = new Panel { Dock = DockStyle.Fill, Padding = new Padding(20) };
@@ -751,6 +877,13 @@ partial class MainForm
     private NumericUpDown numVideoBitrate;
     private NumericUpDown numAudioBitrate;
     private ComboBox cmbAudioChannels;
+    private CheckBox chkEnableKenBurns;
+    private CheckBox chkEnableCrossfade;
+    private NumericUpDown numTransitionDuration;
+    private NumericUpDown numZoomIntensity;
+    private TextBox txtWhisperPath;
+    private ComboBox cmbWhisperModel;
+    private CheckBox chkUseWhisperApi;
     private Button btnSaveSettings;
     
     // Captions Tab Controls

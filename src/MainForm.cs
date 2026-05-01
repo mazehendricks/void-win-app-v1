@@ -196,6 +196,17 @@ public partial class MainForm : Form
         numAudioBitrate.Value = _config.VideoSettings.AudioBitrate;
         cmbAudioChannels.SelectedItem = _config.VideoSettings.AudioChannels == "mono" ? "Mono" : "Stereo";
 
+        // Animation settings
+        chkEnableKenBurns.Checked = _config.VideoSettings.EnableKenBurnsEffect;
+        chkEnableCrossfade.Checked = _config.VideoSettings.EnableCrossfadeTransitions;
+        numTransitionDuration.Value = (decimal)_config.VideoSettings.TransitionDuration;
+        numZoomIntensity.Value = (decimal)_config.VideoSettings.ZoomIntensity;
+
+        // Whisper settings
+        txtWhisperPath.Text = _config.WhisperPath;
+        cmbWhisperModel.SelectedItem = _config.WhisperModel;
+        chkUseWhisperApi.Checked = _config.UseWhisperApi;
+
         // Generate tab - Channel DNA defaults
         txtNiche.Text = _config.DefaultChannelDNA.Niche;
         txtPersona.Text = _config.DefaultChannelDNA.HostPersona;
@@ -573,6 +584,17 @@ public partial class MainForm : Form
         var audioChannelSelection = cmbAudioChannels.SelectedItem?.ToString() ?? "Stereo";
         _config.VideoSettings.AudioChannels = audioChannelSelection.ToLower() == "mono" ? "mono" : "stereo";
 
+        // Animation settings
+        _config.VideoSettings.EnableKenBurnsEffect = chkEnableKenBurns.Checked;
+        _config.VideoSettings.EnableCrossfadeTransitions = chkEnableCrossfade.Checked;
+        _config.VideoSettings.TransitionDuration = (double)numTransitionDuration.Value;
+        _config.VideoSettings.ZoomIntensity = (double)numZoomIntensity.Value;
+
+        // Whisper settings
+        _config.WhisperPath = txtWhisperPath.Text;
+        _config.WhisperModel = cmbWhisperModel.SelectedItem?.ToString() ?? "base";
+        _config.UseWhisperApi = chkUseWhisperApi.Checked;
+
         _config.DefaultChannelDNA = new ChannelDNA
         {
             Niche = txtNiche.Text,
@@ -931,7 +953,11 @@ public partial class MainForm : Form
 
             // Step 1: Transcribe audio
             LogCaptionMessage("Step 1/2: Transcribing audio...");
-            var transcriptionService = new WhisperTranscriptionService("whisper", "base");
+            
+            var whisperPath = _config.UseWhisperApi ? "api" : _config.WhisperPath;
+            var apiKey = _config.UseWhisperApi ? _config.OpenAiApiKey : null;
+            var transcriptionService = new WhisperTranscriptionService(whisperPath, _config.WhisperModel, apiKey);
+            
             var segments = await transcriptionService.TranscribeAsync(txtInputVideo.Text, progress);
             
             LogCaptionMessage($"✓ Transcription complete: {segments.Count} segments");

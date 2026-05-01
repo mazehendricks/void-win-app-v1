@@ -30,6 +30,11 @@ public class AppConfig
     public string FFmpegPath { get; set; } = "ffmpeg";
     public string DefaultOutputPath { get; set; } = "output";
     
+    // Whisper Settings for Captions
+    public string WhisperPath { get; set; } = "whisper";
+    public string WhisperModel { get; set; } = "base"; // tiny, base, small, medium, large
+    public bool UseWhisperApi { get; set; } = false;
+    
     /// <summary>
     /// Unsplash API Access Key for automatic image generation
     /// Get your free API key at: https://unsplash.com/developers

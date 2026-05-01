@@ -8,6 +8,8 @@
   "DarkMode": false,
   "UseGpuAcceleration": false,
   "GpuEncoder": "auto",
+  "UnsplashApiKey": "",
+  "UseUnsplashImages": false,
   "VideoSettings": {
     "Resolution": "1080p",
     "Width": 1920,
@@ -19,7 +21,11 @@
     "VideoCodec": "h264",
     "AudioBitrate": 192,
     "AudioSampleRate": 48000,
-    "AudioChannels": "stereo"
+    "AudioChannels": "stereo",
+    "EnableKenBurnsEffect": true,
+    "EnableCrossfadeTransitions": true,
+    "TransitionDuration": 1.0,
+    "ZoomIntensity": 1.2
   },
   "DefaultChannelDNA": {
     "Niche": "Educational",

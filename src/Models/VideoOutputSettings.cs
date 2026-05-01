@@ -26,6 +26,12 @@ public class VideoOutputSettings
     public int AudioSampleRate { get; set; } = 48000; // Hz
     public string AudioChannels { get; set; } = "stereo";
     
+    // Animation settings
+    public bool EnableKenBurnsEffect { get; set; } = true;
+    public bool EnableCrossfadeTransitions { get; set; } = true;
+    public double TransitionDuration { get; set; } = 1.0; // seconds
+    public double ZoomIntensity { get; set; } = 1.2; // 1.0 = no zoom, 1.5 = 50% zoom
+    
     /// <summary>
     /// Apply resolution preset
     /// </summary>

@@ -231,6 +231,100 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
         var encoderType = _useGpuAcceleration ? "GPU" : "CPU";
         progress?.Report($"Creating video from images and audio using {encoderType} encoding...");
 
+        // Check if animations are enabled
+        if (_outputSettings.EnableKenBurnsEffect || _outputSettings.EnableCrossfadeTransitions)
+        {
+            await CreateAnimatedVideoAsync(imageFiles, audioPath, audioDuration, outputPath, progress);
+        }
+        else
+        {
+            await CreateStaticVideoAsync(imageFiles, audioPath, audioDuration, outputPath, progress);
+        }
+    }
+
+    /// <summary>
+    /// Create video with smooth animations (Ken Burns + crossfades)
+    /// </summary>
+    private async Task CreateAnimatedVideoAsync(
+        List<string> imageFiles,
+        string audioPath,
+        double audioDuration,
+        string outputPath,
+        IProgress<string>? progress = null)
+    {
+        progress?.Report("Creating animated video with Ken Burns effects and crossfade transitions...");
+
+        // Calculate duration per image (accounting for transitions)
+        double transitionDuration = _outputSettings.EnableCrossfadeTransitions ? _outputSettings.TransitionDuration : 0;
+        double effectiveDuration = audioDuration + (transitionDuration * (imageFiles.Count - 1));
+        double durationPerImage = effectiveDuration / imageFiles.Count;
+
+        // Build complex filter for animations
+        var filterComplex = BuildAnimationFilterComplex(imageFiles, durationPerImage, transitionDuration);
+
+        try
+        {
+            // Build FFmpeg arguments
+            string videoCodec = GetVideoCodecArguments();
+            string audioCodec = GetAudioCodecArguments();
+            
+            // Build input arguments
+            var inputArgs = string.Join(" ", imageFiles.Select(img => $"-loop 1 -t {durationPerImage:F3} -i \"{img}\""));
+            
+            using var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = _ffmpegPath,
+                    Arguments = $"{inputArgs} -i \"{audioPath}\" " +
+                                $"-filter_complex \"{filterComplex}\" " +
+                                $"-map \"[outv]\" -map {imageFiles.Count}:a " +
+                                $"{videoCodec} {audioCodec} -pix_fmt yuv420p -r {_outputSettings.FrameRate} " +
+                                $"-shortest \"{outputPath}\"",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                }
+            };
+
+            progress?.Report($"Applying smooth animations...");
+            
+            process.Start();
+            
+            // Read output asynchronously to prevent deadlocks
+            var errorTask = process.StandardError.ReadToEndAsync();
+            var outputTask = process.StandardOutput.ReadToEndAsync();
+            
+            await process.WaitForExitAsync();
+            
+            var error = await errorTask;
+            var output = await outputTask;
+
+            if (process.ExitCode != 0)
+            {
+                throw new Exception($"FFmpeg animated video creation failed: {error}");
+            }
+        }
+        catch (Exception ex)
+        {
+            progress?.Report($"Animation failed, falling back to static video: {ex.Message}");
+            await CreateStaticVideoAsync(imageFiles, audioPath, audioDuration, outputPath, progress);
+        }
+    }
+
+    /// <summary>
+    /// Create static video (original method, fallback)
+    /// </summary>
+    private async Task CreateStaticVideoAsync(
+        List<string> imageFiles,
+        string audioPath,
+        double audioDuration,
+        string outputPath,
+        IProgress<string>? progress = null)
+    {
+        progress?.Report("Creating static video...");
+
         // Calculate duration per image
         var durationPerImage = audioDuration / imageFiles.Count;
 
@@ -275,8 +369,6 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
                     CreateNoWindow = true
                 }
             };
-
-            progress?.Report($"FFmpeg command: {process.StartInfo.Arguments}");
             
             process.Start();
             
@@ -301,6 +393,79 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
                 File.Delete(inputFile);
             }
         }
+    }
+
+    /// <summary>
+    /// Build FFmpeg filter complex for Ken Burns effect and crossfade transitions
+    /// </summary>
+    private string BuildAnimationFilterComplex(List<string> imageFiles, double durationPerImage, double transitionDuration)
+    {
+        var filters = new System.Text.StringBuilder();
+        int width = _outputSettings.Width;
+        int height = _outputSettings.Height;
+        double zoomIntensity = _outputSettings.ZoomIntensity;
+        int fps = _outputSettings.FrameRate;
+
+        // Apply Ken Burns effect to each image
+        for (int i = 0; i < imageFiles.Count; i++)
+        {
+            if (_outputSettings.EnableKenBurnsEffect)
+            {
+                // Alternate between zoom-in and zoom-out for variety
+                bool zoomIn = i % 2 == 0;
+                double startZoom = zoomIn ? 1.0 : zoomIntensity;
+                double endZoom = zoomIn ? zoomIntensity : 1.0;
+                
+                // Calculate zoom parameters
+                int totalFrames = (int)(durationPerImage * fps);
+                double zoomStep = (endZoom - startZoom) / totalFrames;
+                
+                // Ken Burns effect: scale + pan
+                filters.Append($"[{i}:v]scale={width * 2}:{height * 2},");
+                filters.Append($"zoompan=z='if(lte(zoom,1.0),{startZoom},{startZoom}+({zoomStep}*on))':d={totalFrames}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={width}x{height}:fps={fps}");
+                filters.Append($"[v{i}];");
+            }
+            else
+            {
+                // Just scale to proper size
+                filters.Append($"[{i}:v]scale={width}:{height}:force_original_aspect_ratio=decrease,pad={width}:{height}:(ow-iw)/2:(oh-ih)/2[v{i}];");
+            }
+        }
+
+        // Apply crossfade transitions between images
+        if (_outputSettings.EnableCrossfadeTransitions && imageFiles.Count > 1)
+        {
+            // First image
+            filters.Append($"[v0]");
+            
+            // Chain crossfades
+            for (int i = 1; i < imageFiles.Count; i++)
+            {
+                double offset = (durationPerImage * i) - transitionDuration;
+                if (i == 1)
+                {
+                    filters.Append($"[v{i}]xfade=transition=fade:duration={transitionDuration:F3}:offset={offset:F3}");
+                }
+                else
+                {
+                    filters.Append($"[v{i}]xfade=transition=fade:duration={transitionDuration:F3}:offset={offset:F3}");
+                }
+                
+                if (i < imageFiles.Count - 1)
+                {
+                    filters.Append($"[vx{i}];[vx{i}]");
+                }
+            }
+            filters.Append("[outv]");
+        }
+        else
+        {
+            // No transitions, just concatenate
+            filters.Append(string.Join("", Enumerable.Range(0, imageFiles.Count).Select(i => $"[v{i}]")));
+            filters.Append($"concat=n={imageFiles.Count}:v=1:a=0[outv]");
+        }
+
+        return filters.ToString();
     }
 
     /// <summary>

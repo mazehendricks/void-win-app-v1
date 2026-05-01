@@ -234,11 +234,16 @@ public partial class MainForm : Form
             _ => 0 // None
         };
         
-        // Load API key based on provider
-        if (_config.AIVideoGeneration.RunwayML != null)
-            txtVideoApiKey.Text = _config.AIVideoGeneration.RunwayML.ApiKey;
-        else if (_config.AIVideoGeneration.LumaAI != null)
-            txtVideoApiKey.Text = _config.AIVideoGeneration.LumaAI.ApiKey;
+        // Load API key based on selected provider
+        var apiKey = _config.AIVideoGeneration.Provider.ToLower() switch
+        {
+            "runwayml" => _config.AIVideoGeneration.RunwayML?.ApiKey ?? "",
+            "lumaai" => _config.AIVideoGeneration.LumaAI?.ApiKey ?? "",
+            _ => ""
+        };
+        txtVideoApiKey.Text = apiKey;
+        txtVideoApiKey.Visible = !string.IsNullOrEmpty(_config.AIVideoGeneration.Provider) &&
+                                  (_config.AIVideoGeneration.Provider == "RunwayML" || _config.AIVideoGeneration.Provider == "LumaAI");
         
         trackMotionIntensity.Value = (int)_config.AIVideoGeneration.DefaultSettings.MotionIntensity;
         cmbVideoStyle.SelectedItem = _config.AIVideoGeneration.DefaultSettings.Style;

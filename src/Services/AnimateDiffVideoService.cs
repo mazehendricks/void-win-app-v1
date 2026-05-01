@@ -250,21 +250,38 @@ public class AnimateDiffVideoService : IAIVideoGeneratorService, IDisposable
 
             if (status.Status == "completed")
             {
-                // Get the output file path from ComfyUI output directory
-                var outputDir = Path.Combine(
-                    Path.GetDirectoryName(_config.ComfyUIEndpoint.Replace("http://localhost:8188", "")) ?? "",
-                    "output"
-                );
+                // ComfyUI typically saves to its output directory
+                // This assumes ComfyUI is running from its installation directory
+                // Users may need to configure this path in the config
+                var comfyUIDir = Environment.GetEnvironmentVariable("COMFYUI_DIR") ??
+                                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "ComfyUI");
+                var outputDir = Path.Combine(comfyUIDir, "output");
                 
-                // Find the most recent video file
-                var videoFiles = Directory.GetFiles(outputDir, "AnimateDiff*.mp4")
-                    .OrderByDescending(f => File.GetCreationTime(f))
-                    .ToList();
+                if (!Directory.Exists(outputDir))
+                {
+                    // Fallback: try common locations
+                    var fallbackDirs = new[]
+                    {
+                        Path.Combine(Environment.CurrentDirectory, "ComfyUI", "output"),
+                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Documents", "ComfyUI", "output"),
+                        "C:\\ComfyUI\\output"
+                    };
+                    
+                    outputDir = fallbackDirs.FirstOrDefault(Directory.Exists) ?? outputDir;
+                }
+                
+                if (Directory.Exists(outputDir))
+                {
+                    // Find the most recent video file
+                    var videoFiles = Directory.GetFiles(outputDir, "AnimateDiff*.mp4")
+                        .OrderByDescending(f => File.GetCreationTime(f))
+                        .ToList();
 
-                if (videoFiles.Any())
-                    return videoFiles.First();
+                    if (videoFiles.Any())
+                        return videoFiles.First();
+                }
 
-                throw new FileNotFoundException("Generated video file not found in ComfyUI output directory");
+                throw new FileNotFoundException($"Generated video file not found. Please check ComfyUI output directory: {outputDir}");
             }
 
             if (status.Status == "failed")

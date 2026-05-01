@@ -10,6 +10,8 @@ public class PiperTTSService : IVoiceGeneratorService
 {
     private readonly string _piperPath;
     private readonly string _modelPath;
+    private static readonly System.Text.RegularExpressions.Regex VisualCueRegex =
+        new System.Text.RegularExpressions.Regex(@"\[([^\]]+)\]", System.Text.RegularExpressions.RegexOptions.Compiled);
 
     public PiperTTSService(string piperPath = "piper", string modelPath = "models/voice.onnx")
     {
@@ -56,7 +58,7 @@ public class PiperTTSService : IVoiceGeneratorService
         }
 
         // Clean text for TTS (remove visual cues)
-        var cleanText = System.Text.RegularExpressions.Regex.Replace(text, @"\[([^\]]+)\]", "");
+        var cleanText = VisualCueRegex.Replace(text, "");
 
         // Create temp text file
         var tempTextFile = Path.GetTempFileName();

@@ -13,6 +13,8 @@ public class OllamaScriptGenerator : IScriptGeneratorService, IDisposable
     private readonly string _baseUrl;
     private readonly string _model;
     private bool _disposed = false;
+    private static readonly System.Text.RegularExpressions.Regex VisualCueRegex =
+        new System.Text.RegularExpressions.Regex(@"\[([^\]]+)\]", System.Text.RegularExpressions.RegexOptions.Compiled);
 
     public OllamaScriptGenerator(string baseUrl = "http://localhost:11434", string model = "llama3.1")
     {
@@ -31,6 +33,7 @@ public class OllamaScriptGenerator : IScriptGeneratorService, IDisposable
             _httpClient?.Dispose();
             _disposed = true;
         }
+        GC.SuppressFinalize(this);
     }
 
     public async Task<bool> IsAvailableAsync()
@@ -206,7 +209,7 @@ Format the script with clear sections: HOOK, BODY, and CTA.";
         };
 
         // Extract visual cues
-        var visualCues = System.Text.RegularExpressions.Regex.Matches(scriptText, @"\[([^\]]+)\]");
+        var visualCues = VisualCueRegex.Matches(scriptText);
         script.VisualCues = visualCues.Select(m => m.Groups[1].Value).ToList();
 
         // Parse segments (simplified - you can enhance this)
@@ -274,7 +277,7 @@ Format the script with clear sections: HOOK, BODY, and CTA.";
             Text = text.Trim(),
             StartTime = currentTime,
             Duration = duration,
-            VisualCues = System.Text.RegularExpressions.Regex.Matches(text, @"\[([^\]]+)\]")
+            VisualCues = VisualCueRegex.Matches(text)
                 .Select(m => m.Groups[1].Value)
                 .ToList()
         };

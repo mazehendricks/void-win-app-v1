@@ -33,6 +33,24 @@ partial class MainForm
         this.Size = new Size(1000, 700);
         this.StartPosition = FormStartPosition.CenterScreen;
         this.MinimumSize = new Size(800, 600);
+        
+        // Set application icon
+        try
+        {
+            if (File.Exists("src/icon.ico"))
+            {
+                this.Icon = new Icon("src/icon.ico");
+            }
+            else if (File.Exists("icon.ico"))
+            {
+                this.Icon = new Icon("icon.ico");
+            }
+        }
+        catch (Exception ex)
+        {
+            // Icon file not found or invalid, continue without it
+            System.Diagnostics.Debug.WriteLine($"Failed to load icon: {ex.Message}");
+        }
 
         // Tab Control
         tabControl = new TabControl();
@@ -196,6 +214,18 @@ partial class MainForm
         txtFFmpegPath = new TextBox { Location = new Point(200, yPos), Size = new Size(400, 25) };
         settingsPanel.Controls.Add(lblFFmpegPath);
         settingsPanel.Controls.Add(txtFFmpegPath);
+        yPos += 35;
+
+        // Dark Mode Toggle
+        chkDarkMode = new CheckBox {
+            Text = "Enable Dark Mode",
+            Location = new Point(200, yPos),
+            AutoSize = true
+        };
+        chkDarkMode.CheckedChanged += (s, e) => {
+            // Theme will be applied when settings are saved
+        };
+        settingsPanel.Controls.Add(chkDarkMode);
         yPos += 35;
 
         // GPU Acceleration Section
@@ -455,6 +485,7 @@ partial class MainForm
     private TextBox txtPiperPath;
     private TextBox txtPiperModel;
     private TextBox txtFFmpegPath;
+    private CheckBox chkDarkMode;
     private CheckBox chkUseGpu;
     private ComboBox cmbGpuEncoder;
     private ComboBox cmbResolution;

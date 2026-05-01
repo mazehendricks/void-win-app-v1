@@ -13,10 +13,12 @@ public partial class MainForm : Form
 
     public MainForm()
     {
+        _config = new AppConfig(); // Initialize before InitializeComponent
         InitializeComponent();
         LoadConfiguration();
         InitializeServices();
         PopulateFormFromConfig();
+        ApplyTheme(_config.DarkMode);
         CheckOllamaRunning();
     }
 
@@ -77,6 +79,17 @@ public partial class MainForm : Form
     private OllamaScriptGenerator? _scriptGenerator;
     private FFmpegVideoAssembly? _videoAssembly;
     
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _scriptGenerator?.Dispose();
+            _ollamaProcess?.Dispose();
+            components?.Dispose();
+        }
+        base.Dispose(disposing);
+    }
+    
     private void InitializeServices()
     {
         try
@@ -108,6 +121,7 @@ public partial class MainForm : Form
         txtPiperPath.Text = _config.PiperPath;
         txtPiperModel.Text = _config.PiperModelPath;
         txtFFmpegPath.Text = _config.FFmpegPath;
+        chkDarkMode.Checked = _config.DarkMode;
         chkUseGpu.Checked = _config.UseGpuAcceleration;
         cmbGpuEncoder.SelectedItem = _config.GpuEncoder;
 
@@ -322,6 +336,7 @@ public partial class MainForm : Form
         _config.PiperModelPath = txtPiperModel.Text;
         _config.FFmpegPath = txtFFmpegPath.Text;
         _config.DefaultOutputPath = txtOutputPath.Text;
+        _config.DarkMode = chkDarkMode.Checked;
         _config.UseGpuAcceleration = chkUseGpu.Checked;
         _config.GpuEncoder = cmbGpuEncoder.SelectedItem?.ToString() ?? "auto";
 
@@ -331,7 +346,8 @@ public partial class MainForm : Form
         _config.VideoSettings.FrameRate = int.Parse((cmbFrameRate.SelectedItem?.ToString() ?? "30 fps").Replace(" fps", ""));
         _config.VideoSettings.VideoBitrate = (int)numVideoBitrate.Value;
         _config.VideoSettings.AudioBitrate = (int)numAudioBitrate.Value;
-        _config.VideoSettings.AudioChannels = cmbAudioChannels.SelectedItem?.ToString()?.ToLower() ?? "stereo";
+        var audioChannelSelection = cmbAudioChannels.SelectedItem?.ToString() ?? "Stereo";
+        _config.VideoSettings.AudioChannels = audioChannelSelection.ToLower() == "mono" ? "mono" : "stereo";
 
         _config.DefaultChannelDNA = new ChannelDNA
         {
@@ -344,9 +360,92 @@ public partial class MainForm : Form
 
         SaveConfiguration();
         InitializeServices();
+        ApplyTheme(_config.DarkMode);
 
         MessageBox.Show("Settings saved successfully!", "Success",
             MessageBoxButtons.OK, MessageBoxIcon.Information);
+    }
+
+    private void ApplyTheme(bool darkMode)
+    {
+        var colors = darkMode ?
+            (ThemeColors.Dark.Background, ThemeColors.Dark.Surface, ThemeColors.Dark.Text, ThemeColors.Dark.Primary, ThemeColors.Dark.Border) :
+            (ThemeColors.Light.Background, ThemeColors.Light.Surface, ThemeColors.Light.Text, ThemeColors.Light.Primary, ThemeColors.Light.Border);
+
+        // Apply to form
+        this.BackColor = colors.Background;
+        this.ForeColor = colors.Text;
+
+        // Apply to all controls recursively
+        ApplyThemeToControls(this.Controls, colors.Background, colors.Surface, colors.Text, colors.Primary, colors.Border);
+    }
+
+    private void ApplyThemeToControls(Control.ControlCollection controls, Color background, Color surface, Color text, Color primary, Color border)
+    {
+        foreach (Control control in controls)
+        {
+            // Skip controls that should maintain their own colors
+            if (control is Button btn)
+            {
+                btn.BackColor = primary;
+                btn.ForeColor = Color.White;
+                btn.FlatStyle = FlatStyle.Flat;
+                btn.FlatAppearance.BorderColor = border;
+            }
+            else if (control is TextBox || control is RichTextBox)
+            {
+                control.BackColor = surface;
+                control.ForeColor = text;
+            }
+            else if (control is ComboBox cmb)
+            {
+                cmb.BackColor = surface;
+                cmb.ForeColor = text;
+                cmb.FlatStyle = FlatStyle.Flat;
+            }
+            else if (control is NumericUpDown num)
+            {
+                num.BackColor = surface;
+                num.ForeColor = text;
+            }
+            else if (control is CheckBox || control is RadioButton || control is Label || control is GroupBox)
+            {
+                control.ForeColor = text;
+                if (control is GroupBox)
+                {
+                    control.BackColor = background;
+                }
+            }
+            else if (control is TabControl tabControl)
+            {
+                tabControl.BackColor = background;
+                foreach (TabPage page in tabControl.TabPages)
+                {
+                    page.BackColor = background;
+                    page.ForeColor = text;
+                }
+            }
+            else if (control is TabPage)
+            {
+                control.BackColor = background;
+                control.ForeColor = text;
+            }
+            else if (control is Panel || control is SplitContainer)
+            {
+                control.BackColor = background;
+            }
+            else if (control is ProgressBar)
+            {
+                // ProgressBar styling is limited in WinForms
+                control.BackColor = surface;
+            }
+
+            // Recursively apply to child controls
+            if (control.HasChildren)
+            {
+                ApplyThemeToControls(control.Controls, background, surface, text, primary, border);
+            }
+        }
     }
 
     private void LogMessage(string message)
@@ -391,14 +490,21 @@ public partial class MainForm : Form
                     });
                 }
             }
-            catch
+            catch (Exception ex)
             {
                 if (InvokeRequired)
                 {
-                    Invoke(() => AppendConsole("⚠ Ollama server not detected - Click 'Start Ollama Server' to launch"));
+                    Invoke(() => AppendConsole($"⚠ Ollama server not detected - Click 'Start Ollama Server' to launch. Error: {ex.Message}"));
                 }
             }
-        });
+        }).ContinueWith(t =>
+        {
+            if (t.IsFaulted && t.Exception != null)
+            {
+                // Log unhandled task exceptions
+                System.Diagnostics.Debug.WriteLine($"CheckOllamaRunning failed: {t.Exception}");
+            }
+        }, TaskScheduler.Default);
     }
 
     private void BtnStartOllama_Click(object? sender, EventArgs e)

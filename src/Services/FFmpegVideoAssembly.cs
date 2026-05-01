@@ -223,6 +223,11 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
         string outputPath,
         IProgress<string>? progress = null)
     {
+        if (imageFiles == null || imageFiles.Count == 0)
+        {
+            throw new ArgumentException("No image files provided for video creation", nameof(imageFiles));
+        }
+
         var encoderType = _useGpuAcceleration ? "GPU" : "CPU";
         progress?.Report($"Creating video from images and audio using {encoderType} encoding...");
 
@@ -331,7 +336,8 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
     /// </summary>
     private string GetAudioCodecArguments()
     {
-        int channels = _outputSettings.AudioChannels.ToLower() == "mono" ? 1 : 2;
+        _outputSettings ??= new VideoOutputSettings(); // Null safety
+        int channels = (_outputSettings.AudioChannels?.ToLower() ?? "stereo") == "mono" ? 1 : 2;
         return $"-c:a aac -b:a {_outputSettings.AudioBitrate}k -ar {_outputSettings.AudioSampleRate} -ac {channels}";
     }
 

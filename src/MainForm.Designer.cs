@@ -762,59 +762,67 @@ partial class MainForm
         settingsPanel.Controls.Add(grpAiProvider);
         yPos += 290;
 
+        // Tool Paths & Configuration Section - Modern UI
+        var grpToolPaths = new GroupBox {
+            Text = "Tool Paths & Configuration",
+            Location = new Point(10, yPos),
+            Size = new Size(620, 140),
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.H4
+        };
+
         var lblPiperPath = new Label {
             Text = "Piper Path:",
-            Location = new Point(10, yPos),
+            Location = new Point(10, 30),
             AutoSize = true,
             ForeColor = ModernTheme.TextPrimary,
             Font = ModernFonts.Body
         };
         txtPiperPath = new TextBox {
-            Location = new Point(200, yPos),
+            Location = new Point(200, 27),
             Size = new Size(400, 25),
             BackColor = ModernTheme.Surface,
             ForeColor = ModernTheme.TextPrimary,
             BorderStyle = BorderStyle.FixedSingle
         };
-        settingsPanel.Controls.Add(lblPiperPath);
-        settingsPanel.Controls.Add(txtPiperPath);
-        yPos += 35;
 
         var lblPiperModel = new Label {
             Text = "Piper Model Path:",
-            Location = new Point(10, yPos),
+            Location = new Point(10, 65),
             AutoSize = true,
             ForeColor = ModernTheme.TextPrimary,
             Font = ModernFonts.Body
         };
         txtPiperModel = new TextBox {
-            Location = new Point(200, yPos),
+            Location = new Point(200, 62),
             Size = new Size(400, 25),
             BackColor = ModernTheme.Surface,
             ForeColor = ModernTheme.TextPrimary,
             BorderStyle = BorderStyle.FixedSingle
         };
-        settingsPanel.Controls.Add(lblPiperModel);
-        settingsPanel.Controls.Add(txtPiperModel);
-        yPos += 35;
 
         var lblFFmpegPath = new Label {
             Text = "FFmpeg Path:",
-            Location = new Point(10, yPos),
+            Location = new Point(10, 100),
             AutoSize = true,
             ForeColor = ModernTheme.TextPrimary,
             Font = ModernFonts.Body
         };
         txtFFmpegPath = new TextBox {
-            Location = new Point(200, yPos),
+            Location = new Point(200, 97),
             Size = new Size(400, 25),
             BackColor = ModernTheme.Surface,
             ForeColor = ModernTheme.TextPrimary,
             BorderStyle = BorderStyle.FixedSingle
         };
-        settingsPanel.Controls.Add(lblFFmpegPath);
-        settingsPanel.Controls.Add(txtFFmpegPath);
-        yPos += 35;
+
+        grpToolPaths.Controls.AddRange(new Control[] {
+            lblPiperPath, txtPiperPath,
+            lblPiperModel, txtPiperModel,
+            lblFFmpegPath, txtFFmpegPath
+        });
+        settingsPanel.Controls.Add(grpToolPaths);
+        yPos += 150;
 
         // Unsplash API Section - Modern UI
         var grpUnsplash = new GroupBox {
@@ -866,17 +874,18 @@ partial class MainForm
         settingsPanel.Controls.Add(grpUnsplash);
         yPos += 120;
 
-        // AI Video Generation Section - Modern UI
+        // AI Video Generation Section - Modern UI (Compact Layout)
         var grpAIVideo = new GroupBox {
             Text = "AI Video Generation",
             Location = new Point(10, yPos),
-            Size = new Size(900, 220),
+            Size = new Size(900, 140),
             ForeColor = ModernTheme.TextPrimary,
             Font = ModernFonts.H4
         };
         
+        // Row 1: Provider and API Key
         var lblVideoProvider = new Label {
-            Text = "Video Provider:",
+            Text = "Provider:",
             Location = new Point(10, 25),
             AutoSize = true,
             ForeColor = ModernTheme.TextPrimary,
@@ -884,33 +893,33 @@ partial class MainForm
         };
         
         cmbVideoProvider = new ComboBox {
-            Location = new Point(120, 22),
-            Size = new Size(350, 25),
+            Location = new Point(80, 22),
+            Size = new Size(280, 25),
             DropDownStyle = ComboBoxStyle.DropDownList,
             BackColor = ModernTheme.Surface,
             ForeColor = ModernTheme.TextPrimary
         };
         cmbVideoProvider.Items.AddRange(new[] {
-            "None (Use Images Only)",
-            "Runway ML (Cloud - Best Quality)",
-            "Luma AI (Cloud - Excellent)",
-            "AnimateDiff (Local - Free)",
-            "Hybrid (Local - Budget)"
+            "None (Images Only)",
+            "Runway ML (Cloud)",
+            "Luma AI (Cloud)",
+            "AnimateDiff (Local)",
+            "Hybrid (Local)"
         });
         cmbVideoProvider.SelectedIndex = 0;
         cmbVideoProvider.SelectedIndexChanged += CmbVideoProvider_SelectedIndexChanged;
         
         var lblApiKey = new Label {
             Text = "API Key:",
-            Location = new Point(10, 60),
+            Location = new Point(380, 25),
             AutoSize = true,
             ForeColor = ModernTheme.TextPrimary,
             Font = ModernFonts.Body
         };
         
         txtVideoApiKey = new TextBox {
-            Location = new Point(120, 57),
-            Size = new Size(500, 25),
+            Location = new Point(450, 22),
+            Size = new Size(430, 25),
             PasswordChar = '*',
             BackColor = ModernTheme.Surface,
             ForeColor = ModernTheme.TextPrimary,
@@ -918,17 +927,18 @@ partial class MainForm
             Visible = false
         };
         
+        // Row 2: Motion and Style
         var lblMotionIntensity = new Label {
-            Text = "Motion Intensity:",
-            Location = new Point(10, 95),
+            Text = "Motion:",
+            Location = new Point(10, 60),
             AutoSize = true,
             ForeColor = ModernTheme.TextPrimary,
             Font = ModernFonts.Body
         };
         
         trackMotionIntensity = new TrackBar {
-            Location = new Point(120, 92),
-            Size = new Size(300, 45),
+            Location = new Point(80, 57),
+            Size = new Size(200, 45),
             Minimum = 0,
             Maximum = 10,
             Value = 5,
@@ -937,7 +947,7 @@ partial class MainForm
         
         lblMotionValue = new Label {
             Text = "5",
-            Location = new Point(430, 95),
+            Location = new Point(290, 60),
             AutoSize = true,
             ForeColor = ModernTheme.TextSecondary,
             Font = ModernFonts.Body
@@ -949,15 +959,15 @@ partial class MainForm
         
         var lblVideoStyle = new Label {
             Text = "Style:",
-            Location = new Point(10, 145),
+            Location = new Point(340, 60),
             AutoSize = true,
             ForeColor = ModernTheme.TextPrimary,
             Font = ModernFonts.Body
         };
         
         cmbVideoStyle = new ComboBox {
-            Location = new Point(120, 142),
-            Size = new Size(200, 25),
+            Location = new Point(390, 57),
+            Size = new Size(150, 25),
             DropDownStyle = ComboBoxStyle.DropDownList,
             BackColor = ModernTheme.Surface,
             ForeColor = ModernTheme.TextPrimary
@@ -970,10 +980,11 @@ partial class MainForm
         });
         cmbVideoStyle.SelectedIndex = 0;
         
+        // Row 3: Info Label
         lblProviderInfo = new Label {
             Text = "Using static images with voiceover (current behavior)",
-            Location = new Point(10, 180),
-            Size = new Size(880, 30),
+            Location = new Point(10, 105),
+            Size = new Size(880, 25),
             ForeColor = ModernTheme.TextSecondary,
             Font = ModernFonts.Small
         };
@@ -986,13 +997,13 @@ partial class MainForm
             lblProviderInfo
         });
         settingsPanel.Controls.Add(grpAIVideo);
-        yPos += 230;
+        yPos += 150;
 
         // GPU Acceleration Section - Modern UI
         var grpGpuSettings = new GroupBox {
             Text = "Video Encoding Settings",
             Location = new Point(10, yPos),
-            Size = new Size(600, 100),
+            Size = new Size(620, 150),
             ForeColor = ModernTheme.TextPrimary,
             Font = ModernFonts.H4
         };
@@ -1028,11 +1039,23 @@ partial class MainForm
         cmbGpuEncoder.SelectedIndex = 0;
         cmbGpuEncoder.Enabled = false;
         
-        grpGpuSettings.Controls.Add(chkUseGpu);
-        grpGpuSettings.Controls.Add(lblGpuEncoder);
-        grpGpuSettings.Controls.Add(cmbGpuEncoder);
+        var lblGpuInfo = new Label {
+            Text = "Note: GPU acceleration requires FFmpeg with GPU support and compatible hardware.\n" +
+                   "CPU encoding is more compatible but slower. GPU encoding is 3-10x faster.",
+            Location = new Point(10, 90),
+            Size = new Size(600, 50),
+            ForeColor = ModernTheme.TextSecondary,
+            Font = ModernFonts.Small
+        };
+        
+        grpGpuSettings.Controls.AddRange(new Control[] {
+            chkUseGpu,
+            lblGpuEncoder,
+            cmbGpuEncoder,
+            lblGpuInfo
+        });
         settingsPanel.Controls.Add(grpGpuSettings);
-        yPos += 110;
+        yPos += 160;
 
         // Video Output Settings Section - Modern UI
         var grpVideoOutput = new GroupBox {
@@ -1183,18 +1206,6 @@ partial class MainForm
         });
         settingsPanel.Controls.Add(grpVideoOutput);
         yPos += 190;
-
-        // GPU info label - Modern UI
-        var lblGpuInfo = new Label {
-            Text = "Note: GPU acceleration requires FFmpeg with GPU support and compatible hardware.\n" +
-                   "CPU encoding is more compatible but slower. GPU encoding is 3-10x faster.",
-            Location = new Point(10, yPos),
-            Size = new Size(600, 40),
-            ForeColor = ModernTheme.TextSecondary,
-            Font = ModernFonts.Small
-        };
-        settingsPanel.Controls.Add(lblGpuInfo);
-        yPos += 50;
 
         // Animation Settings Section - Modern UI
         var grpAnimationSettings = new GroupBox {

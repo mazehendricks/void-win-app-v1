@@ -1,45 +1,46 @@
 namespace VoidVideoGenerator.Models;
 
 /// <summary>
-/// Modern theme color definitions for light and dark modes
+/// Modern theme color definitions - Updated to use ModernTheme palette
+/// Maintains backward compatibility with existing code
 /// </summary>
 public static class ThemeColors
 {
     public static class Dark
     {
-        // Modern dark theme with purple/blue accents
-        public static Color Background = Color.FromArgb(18, 18, 18);      // Very dark background
-        public static Color Surface = Color.FromArgb(28, 28, 30);         // Slightly lighter surface
-        public static Color SurfaceVariant = Color.FromArgb(38, 38, 42);  // Card/panel background
-        public static Color Text = Color.FromArgb(240, 240, 245);         // Off-white text
-        public static Color TextSecondary = Color.FromArgb(160, 160, 170); // Muted text
-        public static Color Primary = Color.FromArgb(138, 43, 226);       // Purple accent
-        public static Color PrimaryHover = Color.FromArgb(155, 70, 235);  // Lighter purple on hover
-        public static Color Secondary = Color.FromArgb(0, 150, 255);      // Blue accent
-        public static Color Border = Color.FromArgb(50, 50, 55);          // Subtle border
-        public static Color InputBackground = Color.FromArgb(32, 32, 35); // Input fields
-        public static Color ButtonBackground = Color.FromArgb(45, 45, 50); // Buttons
-        public static Color Success = Color.FromArgb(76, 175, 80);        // Green
-        public static Color Warning = Color.FromArgb(255, 152, 0);        // Orange
-        public static Color Error = Color.FromArgb(244, 67, 54);          // Red
+        // Modern dark theme using Indigo/Slate palette
+        public static Color Background = ModernTheme.Background;           // Slate-900
+        public static Color Surface = ModernTheme.Surface;                 // Slate-800
+        public static Color SurfaceVariant = ModernTheme.SurfaceHover;     // Slate-700
+        public static Color Text = ModernTheme.TextPrimary;                // Slate-50
+        public static Color TextSecondary = ModernTheme.TextSecondary;     // Slate-300
+        public static Color Primary = ModernTheme.Primary;                 // Indigo-500
+        public static Color PrimaryHover = ModernTheme.PrimaryHover;       // Indigo-600
+        public static Color Secondary = ModernTheme.Info;                  // Blue-500
+        public static Color Border = ModernTheme.Border;                   // Slate-700
+        public static Color InputBackground = ModernTheme.Surface;         // Slate-800
+        public static Color ButtonBackground = ModernTheme.SurfaceHover;   // Slate-700
+        public static Color Success = ModernTheme.Success;                 // Green-500
+        public static Color Warning = ModernTheme.Warning;                 // Orange-400
+        public static Color Error = ModernTheme.Error;                     // Red-500
     }
 
     public static class Light
     {
-        // Modern light theme
+        // Light theme (for future use)
         public static Color Background = Color.FromArgb(248, 249, 250);
         public static Color Surface = Color.White;
         public static Color SurfaceVariant = Color.FromArgb(245, 245, 247);
         public static Color Text = Color.FromArgb(20, 20, 25);
         public static Color TextSecondary = Color.FromArgb(100, 100, 110);
-        public static Color Primary = Color.FromArgb(138, 43, 226);
-        public static Color PrimaryHover = Color.FromArgb(155, 70, 235);
-        public static Color Secondary = Color.FromArgb(0, 120, 215);
+        public static Color Primary = ModernTheme.Primary;
+        public static Color PrimaryHover = ModernTheme.PrimaryHover;
+        public static Color Secondary = ModernTheme.Info;
         public static Color Border = Color.FromArgb(220, 220, 225);
         public static Color InputBackground = Color.White;
         public static Color ButtonBackground = Color.FromArgb(240, 240, 242);
-        public static Color Success = Color.FromArgb(76, 175, 80);
-        public static Color Warning = Color.FromArgb(255, 152, 0);
-        public static Color Error = Color.FromArgb(244, 67, 54);
+        public static Color Success = ModernTheme.Success;
+        public static Color Warning = ModernTheme.Warning;
+        public static Color Error = ModernTheme.Error;
     }
 }

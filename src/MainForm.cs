@@ -106,7 +106,23 @@ public partial class MainForm : Form
             var voiceGenerator = new PiperTTSService(_config.PiperPath, _config.PiperModelPath);
             _videoAssembly = new FFmpegVideoAssembly(_config.FFmpegPath, _config.UseGpuAcceleration, _config.GpuEncoder, _config.VideoSettings);
 
-            _pipeline = new VideoGenerationPipeline(_scriptGenerator, voiceGenerator, _videoAssembly);
+            // Initialize AI video generator if configured
+            IAIVideoGeneratorService? aiVideoGenerator = null;
+            if (_config.AIVideoGeneration.Provider != "None")
+            {
+                try
+                {
+                    var factory = new AIVideoGeneratorFactory(_config.AIVideoGeneration);
+                    aiVideoGenerator = factory.CreateGenerator();
+                    LogMessage($"AI Video Provider: {_config.AIVideoGeneration.Provider}");
+                }
+                catch (Exception ex)
+                {
+                    LogMessage($"Warning: Could not initialize AI video generator: {ex.Message}");
+                }
+            }
+
+            _pipeline = new VideoGenerationPipeline(_scriptGenerator, voiceGenerator, _videoAssembly, aiVideoGenerator, _config.AIVideoGeneration);
             LogMessage("Services initialized");
             LogMessage($"AI Provider: {_config.AiProvider.ToUpper()}");
             LogMessage($"GPU Acceleration: {(_config.UseGpuAcceleration ? "Enabled" : "Disabled")}");
@@ -207,6 +223,25 @@ public partial class MainForm : Form
         txtWhisperPath.Text = _config.WhisperPath;
         cmbWhisperModel.SelectedItem = _config.WhisperModel;
         chkUseWhisperApi.Checked = _config.UseWhisperApi;
+
+        // AI Video Generation settings
+        cmbVideoProvider.SelectedIndex = _config.AIVideoGeneration.Provider.ToLower() switch
+        {
+            "runwayml" => 1,
+            "lumaai" => 2,
+            "animatediff" => 3,
+            "hybrid" => 4,
+            _ => 0 // None
+        };
+        
+        // Load API key based on provider
+        if (_config.AIVideoGeneration.RunwayML != null)
+            txtVideoApiKey.Text = _config.AIVideoGeneration.RunwayML.ApiKey;
+        else if (_config.AIVideoGeneration.LumaAI != null)
+            txtVideoApiKey.Text = _config.AIVideoGeneration.LumaAI.ApiKey;
+        
+        trackMotionIntensity.Value = (int)_config.AIVideoGeneration.DefaultSettings.MotionIntensity;
+        cmbVideoStyle.SelectedItem = _config.AIVideoGeneration.DefaultSettings.Style;
 
         // Generate tab - Channel DNA defaults
         txtNiche.Text = _config.DefaultChannelDNA.Niche;
@@ -759,6 +794,33 @@ public partial class MainForm : Form
         _config.WhisperPath = txtWhisperPath.Text;
         _config.WhisperModel = cmbWhisperModel.SelectedItem?.ToString() ?? "base";
         _config.UseWhisperApi = chkUseWhisperApi.Checked;
+
+        // AI Video Generation settings
+        _config.AIVideoGeneration.Provider = cmbVideoProvider.SelectedIndex switch
+        {
+            1 => "RunwayML",
+            2 => "LumaAI",
+            3 => "AnimateDiff",
+            4 => "Hybrid",
+            _ => "None"
+        };
+        
+        // Save API key to appropriate provider
+        if (_config.AIVideoGeneration.Provider == "RunwayML")
+        {
+            if (_config.AIVideoGeneration.RunwayML == null)
+                _config.AIVideoGeneration.RunwayML = new RunwayMLConfig();
+            _config.AIVideoGeneration.RunwayML.ApiKey = txtVideoApiKey.Text;
+        }
+        else if (_config.AIVideoGeneration.Provider == "LumaAI")
+        {
+            if (_config.AIVideoGeneration.LumaAI == null)
+                _config.AIVideoGeneration.LumaAI = new LumaAIConfig();
+            _config.AIVideoGeneration.LumaAI.ApiKey = txtVideoApiKey.Text;
+        }
+        
+        _config.AIVideoGeneration.DefaultSettings.MotionIntensity = trackMotionIntensity.Value;
+        _config.AIVideoGeneration.DefaultSettings.Style = cmbVideoStyle.SelectedItem?.ToString() ?? "realistic";
 
         _config.DefaultChannelDNA = new ChannelDNA
         {
@@ -1466,6 +1528,37 @@ public partial class MainForm : Form
 
         // Update form title to show shortcuts
         this.Text = "Void Video Generator - [Ctrl+G: Generate | F1-F4: Switch Tabs | Ctrl+Q: Quit]";
+    }
+
+    private void CmbVideoProvider_SelectedIndexChanged(object? sender, EventArgs e)
+    {
+        var provider = cmbVideoProvider.SelectedIndex switch
+        {
+            0 => "None",
+            1 => "RunwayML",
+            2 => "LumaAI",
+            3 => "AnimateDiff",
+            4 => "Hybrid",
+            _ => "None"
+        };
+        
+        // Show/hide API key field based on provider
+        var needsApiKey = provider == "RunwayML" || provider == "LumaAI";
+        txtVideoApiKey.Visible = needsApiKey;
+        
+        // Update info label with provider details
+        var info = provider switch
+        {
+            "RunwayML" => "Cloud-based, ~$3/min, best quality, max 10 seconds per clip. Requires API key from runwayml.com",
+            "LumaAI" => "Cloud-based, ~$3.60/min, excellent quality, max 5 seconds per clip. Requires API key from lumalabs.ai",
+            "AnimateDiff" => "Local generation via ComfyUI, free but requires RTX 3060+ GPU, max 10 seconds. ComfyUI must be running on localhost:8188",
+            "Hybrid" => "Local keyframe generation + interpolation, free, requires FFmpeg, max 30 seconds. Budget-friendly option.",
+            _ => "Using static images with voiceover (current behavior). No AI video generation."
+        };
+        
+        lblProviderInfo.Text = info;
+        
+        LogMessage($"AI Video Provider changed to: {provider}");
     }
 
 }

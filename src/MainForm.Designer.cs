@@ -866,6 +866,128 @@ partial class MainForm
         settingsPanel.Controls.Add(grpUnsplash);
         yPos += 120;
 
+        // AI Video Generation Section - Modern UI
+        var grpAIVideo = new GroupBox {
+            Text = "AI Video Generation",
+            Location = new Point(10, yPos),
+            Size = new Size(900, 220),
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.H4
+        };
+        
+        var lblVideoProvider = new Label {
+            Text = "Video Provider:",
+            Location = new Point(10, 25),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        
+        cmbVideoProvider = new ComboBox {
+            Location = new Point(120, 22),
+            Size = new Size(350, 25),
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary
+        };
+        cmbVideoProvider.Items.AddRange(new[] {
+            "None (Use Images Only)",
+            "Runway ML (Cloud - Best Quality)",
+            "Luma AI (Cloud - Excellent)",
+            "AnimateDiff (Local - Free)",
+            "Hybrid (Local - Budget)"
+        });
+        cmbVideoProvider.SelectedIndex = 0;
+        cmbVideoProvider.SelectedIndexChanged += CmbVideoProvider_SelectedIndexChanged;
+        
+        var lblApiKey = new Label {
+            Text = "API Key:",
+            Location = new Point(10, 60),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        
+        txtVideoApiKey = new TextBox {
+            Location = new Point(120, 57),
+            Size = new Size(500, 25),
+            PasswordChar = '*',
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle,
+            Visible = false
+        };
+        
+        var lblMotionIntensity = new Label {
+            Text = "Motion Intensity:",
+            Location = new Point(10, 95),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        
+        trackMotionIntensity = new TrackBar {
+            Location = new Point(120, 92),
+            Size = new Size(300, 45),
+            Minimum = 0,
+            Maximum = 10,
+            Value = 5,
+            TickFrequency = 1
+        };
+        
+        lblMotionValue = new Label {
+            Text = "5",
+            Location = new Point(430, 95),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextSecondary,
+            Font = ModernFonts.Body
+        };
+        
+        trackMotionIntensity.ValueChanged += (s, e) => {
+            lblMotionValue.Text = trackMotionIntensity.Value.ToString();
+        };
+        
+        var lblVideoStyle = new Label {
+            Text = "Style:",
+            Location = new Point(10, 145),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        
+        cmbVideoStyle = new ComboBox {
+            Location = new Point(120, 142),
+            Size = new Size(200, 25),
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary
+        };
+        cmbVideoStyle.Items.AddRange(new[] {
+            "realistic",
+            "cinematic",
+            "animated",
+            "artistic"
+        });
+        cmbVideoStyle.SelectedIndex = 0;
+        
+        lblProviderInfo = new Label {
+            Text = "Using static images with voiceover (current behavior)",
+            Location = new Point(10, 180),
+            Size = new Size(880, 30),
+            ForeColor = ModernTheme.TextSecondary,
+            Font = ModernFonts.Small
+        };
+        
+        grpAIVideo.Controls.AddRange(new Control[] {
+            lblVideoProvider, cmbVideoProvider,
+            lblApiKey, txtVideoApiKey,
+            lblMotionIntensity, trackMotionIntensity, lblMotionValue,
+            lblVideoStyle, cmbVideoStyle,
+            lblProviderInfo
+        });
+        settingsPanel.Controls.Add(grpAIVideo);
+        yPos += 230;
+
         // GPU Acceleration Section - Modern UI
         var grpGpuSettings = new GroupBox {
             Text = "Video Encoding Settings",
@@ -1394,6 +1516,14 @@ partial class MainForm
     private ComboBox cmbWhisperModel;
     private CheckBox chkUseWhisperApi;
     private Button btnSaveSettings;
+    
+    // AI Video Generation Controls
+    private ComboBox cmbVideoProvider;
+    private TextBox txtVideoApiKey;
+    private TrackBar trackMotionIntensity;
+    private Label lblMotionValue;
+    private ComboBox cmbVideoStyle;
+    private Label lblProviderInfo;
     
     // Captions Tab Controls
     private TextBox txtInputVideo;

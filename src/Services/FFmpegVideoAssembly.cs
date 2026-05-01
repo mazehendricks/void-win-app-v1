@@ -360,8 +360,33 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
         Directory.CreateDirectory(outputDirectory);
         var imageFiles = new List<string>();
 
-        // For now, just return empty list - user will need to provide images
-        // or integrate with Stable Diffusion
+        // Create a simple black placeholder image using FFmpeg
+        var placeholderPath = Path.Combine(outputDirectory, "placeholder.png");
+        
+        var process = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = _ffmpegPath,
+                Arguments = $"-f lavfi -i color=c=black:s=1920x1080:d=1 -frames:v 1 \"{placeholderPath}\"",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            }
+        };
+
+        process.Start();
+        await process.WaitForExitAsync();
+
+        if (File.Exists(placeholderPath))
+        {
+            imageFiles.Add(placeholderPath);
+        }
+        else
+        {
+            throw new Exception("Failed to create placeholder image. Please provide images in the visuals directory.");
+        }
         
         return imageFiles;
     }

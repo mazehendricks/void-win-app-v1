@@ -57,8 +57,10 @@ partial class MainForm
         tabControl.TabPages.Add(tabDebug);
 
         // === GENERATE TAB ===
-        var generatePanel = new Panel { Dock = DockStyle.Fill, Padding = new Padding(20) };
-        tabGenerate.Controls.Add(generatePanel);
+        var generateScrollPanel = new Panel { Dock = DockStyle.Fill, AutoScroll = true };
+        var generatePanel = new Panel { Dock = DockStyle.Top, Padding = new Padding(20), AutoSize = true };
+        generateScrollPanel.Controls.Add(generatePanel);
+        tabGenerate.Controls.Add(generateScrollPanel);
 
         int yPos = 10;
 
@@ -222,8 +224,10 @@ partial class MainForm
         generatePanel.Controls.Add(txtLog);
 
         // === CAPTIONS TAB ===
-        var captionsPanel = new Panel { Dock = DockStyle.Fill, Padding = new Padding(20) };
-        tabCaptions.Controls.Add(captionsPanel);
+        var captionsScrollPanel = new Panel { Dock = DockStyle.Fill, AutoScroll = true };
+        var captionsPanel = new Panel { Dock = DockStyle.Top, Padding = new Padding(20), AutoSize = true };
+        captionsScrollPanel.Controls.Add(captionsPanel);
+        tabCaptions.Controls.Add(captionsScrollPanel);
 
         yPos = 10;
         
@@ -319,8 +323,10 @@ partial class MainForm
         captionsPanel.Controls.Add(txtCaptionsLog);
 
         // === SETTINGS TAB ===
-        var settingsPanel = new Panel { Dock = DockStyle.Fill, Padding = new Padding(20) };
-        tabSettings.Controls.Add(settingsPanel);
+        var settingsScrollPanel = new Panel { Dock = DockStyle.Fill, AutoScroll = true };
+        var settingsPanel = new Panel { Dock = DockStyle.Top, Padding = new Padding(20), AutoSize = true };
+        settingsScrollPanel.Controls.Add(settingsPanel);
+        tabSettings.Controls.Add(settingsScrollPanel);
 
         yPos = 10;
         

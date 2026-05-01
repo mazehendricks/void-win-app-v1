@@ -359,21 +359,21 @@ public partial class MainForm : Form
             var audioDirectory = Path.Combine(request.OutputPath, "audio");
             Directory.CreateDirectory(audioDirectory);
             
-            progress?.Report("Step 2/4: Generating voice audio...");
+            progress.Report("Step 2/4: Generating voice audio...");
             var voiceGenerator = new PiperTTSService(_config.PiperPath, _config.PiperModelPath);
             var audioFiles = await voiceGenerator.GenerateScriptAudioAsync(script, audioDirectory, progress);
             
             // Save script for reference
             var scriptPath = Path.Combine(request.OutputPath, "script.txt");
             await File.WriteAllTextAsync(scriptPath, script.FullText);
-            progress?.Report($"Script saved to: {scriptPath}");
+            progress.Report($"Script saved to: {scriptPath}");
             
             // Assemble video
-            progress?.Report("Step 4/4: Assembling final video...");
+            progress.Report("Step 4/4: Assembling final video...");
             var videoPath = Path.Combine(request.OutputPath, $"{SanitizeFileName(request.Title)}.mp4");
             await _videoAssembly!.CreateVideoFromScriptAsync(script, audioDirectory, visualsDir, videoPath, progress);
             
-            progress?.Report($"✓ Video generation complete: {videoPath}");
+            progress.Report($"✓ Video generation complete: {videoPath}");
 
             MessageBox.Show($"Video generated successfully!\n\nLocation: {videoPath}", 
                 "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);

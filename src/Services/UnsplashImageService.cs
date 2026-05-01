@@ -115,10 +115,10 @@ public class UnsplashImageService
                 foreach (var photo in result.Results.Take(count))
                 {
                     // Use regular quality for faster downloads
-                    var url = photo.Urls?.Regular ?? photo.Urls?.Full ?? "";
-                    if (!string.IsNullOrEmpty(url))
+                    var imageUrl = photo.Urls?.Regular ?? photo.Urls?.Full ?? "";
+                    if (!string.IsNullOrEmpty(imageUrl))
                     {
-                        imageUrls.Add(url);
+                        imageUrls.Add(imageUrl);
                     }
                 }
             }

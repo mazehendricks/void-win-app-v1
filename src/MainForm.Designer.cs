@@ -44,16 +44,32 @@ partial class MainForm
             System.Diagnostics.Debug.WriteLine($"Failed to load icon: {ex.Message}");
         }
 
-        // Tab Control
+        // Tab Control - Modern UI
         tabControl = new TabControl();
         tabControl.Dock = DockStyle.Fill;
+        tabControl.BackColor = ModernTheme.Surface;
+        tabControl.ForeColor = ModernTheme.TextPrimary;
         
-        // Tabs
+        // Tabs - Modern UI
         tabGenerate = new TabPage("Generate Video");
+        tabGenerate.BackColor = ModernTheme.Background;
+        tabGenerate.ForeColor = ModernTheme.TextPrimary;
+        
         tabCaptions = new TabPage("Add Captions");
+        tabCaptions.BackColor = ModernTheme.Background;
+        tabCaptions.ForeColor = ModernTheme.TextPrimary;
+        
         tabSettings = new TabPage("Settings");
+        tabSettings.BackColor = ModernTheme.Background;
+        tabSettings.ForeColor = ModernTheme.TextPrimary;
+        
         tabStatus = new TabPage("System Status");
+        tabStatus.BackColor = ModernTheme.Background;
+        tabStatus.ForeColor = ModernTheme.TextPrimary;
+        
         tabDebug = new TabPage("Debug Console");
+        tabDebug.BackColor = ModernTheme.Background;
+        tabDebug.ForeColor = ModernTheme.TextPrimary;
         
         tabControl.TabPages.Add(tabGenerate);
         tabControl.TabPages.Add(tabCaptions);
@@ -70,58 +86,150 @@ partial class MainForm
         int yPos = 10;
 
         // Title
-        var lblTitle = new Label { Text = "Video Title:", Location = new Point(10, yPos), AutoSize = true };
-        txtTitle = new TextBox { Location = new Point(10, yPos + 25), Size = new Size(900, 25) };
+        var lblTitle = new Label {
+            Text = "Video Title:",
+            Location = new Point(10, yPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtTitle = new TextBox {
+            Location = new Point(10, yPos + 25),
+            Size = new Size(900, 25),
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
+        };
         generatePanel.Controls.Add(lblTitle);
         generatePanel.Controls.Add(txtTitle);
         yPos += 60;
 
         // Topic
-        var lblTopic = new Label { Text = "Topic/Description:", Location = new Point(10, yPos), AutoSize = true };
-        txtTopic = new TextBox { 
-            Location = new Point(10, yPos + 25), 
+        var lblTopic = new Label {
+            Text = "Topic/Description:",
+            Location = new Point(10, yPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtTopic = new TextBox {
+            Location = new Point(10, yPos + 25),
             Size = new Size(900, 80),
             Multiline = true,
-            ScrollBars = ScrollBars.Vertical
+            ScrollBars = ScrollBars.Vertical,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
         };
         generatePanel.Controls.Add(lblTopic);
         generatePanel.Controls.Add(txtTopic);
         yPos += 115;
 
         // Duration
-        var lblDuration = new Label { Text = "Target Duration (seconds):", Location = new Point(10, yPos), AutoSize = true };
-        numDuration = new NumericUpDown { 
-            Location = new Point(200, yPos), 
+        var lblDuration = new Label {
+            Text = "Target Duration (seconds):",
+            Location = new Point(10, yPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        numDuration = new NumericUpDown {
+            Location = new Point(200, yPos),
             Size = new Size(100, 25),
             Minimum = 15,
             Maximum = 600,
-            Value = 60
+            Value = 60,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
         };
         generatePanel.Controls.Add(lblDuration);
         generatePanel.Controls.Add(numDuration);
         yPos += 40;
 
-        // Channel DNA Section
-        var grpChannelDNA = new GroupBox { 
-            Text = "Channel DNA", 
-            Location = new Point(10, yPos), 
-            Size = new Size(900, 180) 
+        // Channel DNA Section - Modern UI
+        var grpChannelDNA = new GroupBox {
+            Text = "Channel DNA",
+            Location = new Point(10, yPos),
+            Size = new Size(900, 180),
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.H4
         };
         
-        var lblNiche = new Label { Text = "Niche:", Location = new Point(10, 25), AutoSize = true };
-        txtNiche = new TextBox { Location = new Point(150, 22), Size = new Size(700, 25) };
+        var lblNiche = new Label {
+            Text = "Niche:",
+            Location = new Point(10, 25),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtNiche = new TextBox {
+            Location = new Point(150, 22),
+            Size = new Size(700, 25),
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
+        };
         
-        var lblPersona = new Label { Text = "Host Persona:", Location = new Point(10, 55), AutoSize = true };
-        txtPersona = new TextBox { Location = new Point(150, 52), Size = new Size(700, 25) };
+        var lblPersona = new Label {
+            Text = "Host Persona:",
+            Location = new Point(10, 55),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtPersona = new TextBox {
+            Location = new Point(150, 52),
+            Size = new Size(700, 25),
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
+        };
         
-        var lblTone = new Label { Text = "Tone Guidelines:", Location = new Point(10, 85), AutoSize = true };
-        txtTone = new TextBox { Location = new Point(150, 82), Size = new Size(700, 25) };
+        var lblTone = new Label {
+            Text = "Tone Guidelines:",
+            Location = new Point(10, 85),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtTone = new TextBox {
+            Location = new Point(150, 82),
+            Size = new Size(700, 25),
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
+        };
         
-        var lblAudience = new Label { Text = "Target Audience:", Location = new Point(10, 115), AutoSize = true };
-        txtAudience = new TextBox { Location = new Point(150, 112), Size = new Size(700, 25) };
+        var lblAudience = new Label {
+            Text = "Target Audience:",
+            Location = new Point(10, 115),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtAudience = new TextBox {
+            Location = new Point(150, 112),
+            Size = new Size(700, 25),
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
+        };
         
-        var lblStyle = new Label { Text = "Content Style:", Location = new Point(10, 145), AutoSize = true };
-        txtStyle = new TextBox { Location = new Point(150, 142), Size = new Size(700, 25) };
+        var lblStyle = new Label {
+            Text = "Content Style:",
+            Location = new Point(10, 145),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtStyle = new TextBox {
+            Location = new Point(150, 142),
+            Size = new Size(700, 25),
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
+        };
         
         grpChannelDNA.Controls.AddRange(new Control[] { 
             lblNiche, txtNiche, lblPersona, txtPersona, lblTone, txtTone, 
@@ -130,14 +238,27 @@ partial class MainForm
         generatePanel.Controls.Add(grpChannelDNA);
         yPos += 190;
 
-        // Output Path
-        var lblOutput = new Label { Text = "Output Folder:", Location = new Point(10, yPos), AutoSize = true };
-        txtOutputPath = new TextBox { Location = new Point(10, yPos + 25), Size = new Size(800, 25) };
-        btnBrowseOutput = new Button {
+        // Output Path - Modern UI
+        var lblOutput = new Label {
+            Text = "Output Folder:",
+            Location = new Point(10, yPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtOutputPath = new TextBox {
+            Location = new Point(10, yPos + 25),
+            Size = new Size(800, 25),
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
+        };
+        btnBrowseOutput = new ModernButton {
             Text = "Browse...",
             Location = new Point(820, yPos + 23),
             Size = new Size(100, 30),
-            AutoSize = false
+            Style = ModernButton.ButtonStyle.Secondary,
+            BorderRadius = BorderRadius.SM
         };
         btnBrowseOutput.Click += BtnBrowseOutput_Click;
         generatePanel.Controls.Add(lblOutput);
@@ -145,51 +266,59 @@ partial class MainForm
         generatePanel.Controls.Add(btnBrowseOutput);
         yPos += 60;
 
-        // Visuals Section
+        // Visuals Section - Modern UI
         var grpVisuals = new GroupBox {
             Text = "Visuals (Images for Video)",
             Location = new Point(10, yPos),
-            Size = new Size(900, 120)
+            Size = new Size(900, 120),
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.H4
         };
         
         var lblVisualsInfo = new Label {
             Text = "Add images to use in your video. Images will be displayed in order during the video.",
             Location = new Point(10, 25),
             Size = new Size(880, 20),
-            ForeColor = Color.DarkBlue
+            ForeColor = ModernTheme.Accent
         };
         
         lstVisuals = new ListBox {
             Location = new Point(10, 50),
             Size = new Size(700, 60),
-            SelectionMode = SelectionMode.MultiExtended
+            SelectionMode = SelectionMode.MultiExtended,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
         };
         lstVisuals.SelectedIndexChanged += (s, e) => {
             btnRemoveImages.Enabled = lstVisuals.SelectedIndices.Count > 0;
         };
         
-        btnAddImages = new Button {
+        btnAddImages = new ModernButton {
             Text = "Add Images",
             Location = new Point(720, 50),
             Size = new Size(100, 30),
-            AutoSize = false
+            Style = ModernButton.ButtonStyle.Secondary,
+            BorderRadius = BorderRadius.SM
         };
         btnAddImages.Click += BtnAddImages_Click;
         
-        btnRemoveImages = new Button {
+        btnRemoveImages = new ModernButton {
             Text = "Remove",
             Location = new Point(720, 83),
             Size = new Size(100, 30),
             Enabled = false,
-            AutoSize = false
+            Style = ModernButton.ButtonStyle.Outline,
+            BorderRadius = BorderRadius.SM
         };
         btnRemoveImages.Click += BtnRemoveImages_Click;
         
-        btnClearImages = new Button {
+        btnClearImages = new ModernButton {
             Text = "Clear All",
             Location = new Point(830, 50),
             Size = new Size(100, 30),
-            AutoSize = false
+            Style = ModernButton.ButtonStyle.Outline,
+            BorderRadius = BorderRadius.SM
         };
         btnClearImages.Click += BtnClearImages_Click;
         
@@ -221,15 +350,24 @@ partial class MainForm
         generatePanel.Controls.Add(progressBar);
         yPos += 50;
 
-        // Status Log
-        var lblLog = new Label { Text = "Status Log:", Location = new Point(10, yPos), AutoSize = true };
-        txtLog = new TextBox { 
-            Location = new Point(10, yPos + 25), 
+        // Status Log - Modern UI
+        var lblLog = new Label {
+            Text = "Status Log:",
+            Location = new Point(10, yPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtLog = new TextBox {
+            Location = new Point(10, yPos + 25),
             Size = new Size(900, 100),
             Multiline = true,
             ScrollBars = ScrollBars.Vertical,
             ReadOnly = true,
-            BackColor = Color.White
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle,
+            Font = ModernFonts.Code
         };
         generatePanel.Controls.Add(lblLog);
         generatePanel.Controls.Add(txtLog);
@@ -245,38 +383,85 @@ partial class MainForm
         var lblCaptionsTitle = new Label {
             Text = "Add Captions to Existing Video",
             Location = new Point(10, yPos),
-            Font = new Font("Segoe UI", 14, FontStyle.Bold),
+            Font = ModernFonts.H2,
+            ForeColor = ModernTheme.TextPrimary,
             AutoSize = true
         };
         captionsPanel.Controls.Add(lblCaptionsTitle);
         yPos += 40;
 
-        // Input Video
-        var lblInputVideo = new Label { Text = "Input Video:", Location = new Point(10, yPos), AutoSize = true };
-        txtInputVideo = new TextBox { Location = new Point(120, yPos), Size = new Size(500, 25), ReadOnly = true };
-        btnBrowseInputVideo = new Button { Text = "Browse...", Location = new Point(630, yPos - 2), Size = new Size(100, 30) };
+        // Input Video - Modern UI
+        var lblInputVideo = new Label {
+            Text = "Input Video:",
+            Location = new Point(10, yPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtInputVideo = new TextBox {
+            Location = new Point(120, yPos),
+            Size = new Size(500, 25),
+            ReadOnly = true,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
+        };
+        btnBrowseInputVideo = new ModernButton {
+            Text = "Browse...",
+            Location = new Point(630, yPos - 2),
+            Size = new Size(100, 30),
+            Style = ModernButton.ButtonStyle.Secondary,
+            BorderRadius = BorderRadius.SM
+        };
         btnBrowseInputVideo.Click += BtnBrowseInputVideo_Click;
         captionsPanel.Controls.Add(lblInputVideo);
         captionsPanel.Controls.Add(txtInputVideo);
         captionsPanel.Controls.Add(btnBrowseInputVideo);
         yPos += 40;
 
-        // Output Video
-        var lblOutputVideo = new Label { Text = "Output Video:", Location = new Point(10, yPos), AutoSize = true };
-        txtOutputVideo = new TextBox { Location = new Point(120, yPos), Size = new Size(500, 25) };
-        btnBrowseOutputVideo = new Button { Text = "Browse...", Location = new Point(630, yPos - 2), Size = new Size(100, 30) };
+        // Output Video - Modern UI
+        var lblOutputVideo = new Label {
+            Text = "Output Video:",
+            Location = new Point(10, yPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtOutputVideo = new TextBox {
+            Location = new Point(120, yPos),
+            Size = new Size(500, 25),
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
+        };
+        btnBrowseOutputVideo = new ModernButton {
+            Text = "Browse...",
+            Location = new Point(630, yPos - 2),
+            Size = new Size(100, 30),
+            Style = ModernButton.ButtonStyle.Secondary,
+            BorderRadius = BorderRadius.SM
+        };
         btnBrowseOutputVideo.Click += BtnBrowseOutputVideo_Click;
         captionsPanel.Controls.Add(lblOutputVideo);
         captionsPanel.Controls.Add(txtOutputVideo);
         captionsPanel.Controls.Add(btnBrowseOutputVideo);
         yPos += 40;
 
-        // Caption Style
-        var lblCaptionStyle = new Label { Text = "Caption Style:", Location = new Point(10, yPos), AutoSize = true };
+        // Caption Style - Modern UI
+        var lblCaptionStyle = new Label {
+            Text = "Caption Style:",
+            Location = new Point(10, yPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
         cmbCaptionStyle = new ComboBox {
             Location = new Point(120, yPos),
             Size = new Size(200, 25),
-            DropDownStyle = ComboBoxStyle.DropDownList
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            FlatStyle = FlatStyle.Flat
         };
         cmbCaptionStyle.Items.AddRange(new object[] { "YouTube", "TikTok", "Minimal", "Custom" });
         cmbCaptionStyle.SelectedIndex = 0;
@@ -284,12 +469,21 @@ partial class MainForm
         captionsPanel.Controls.Add(cmbCaptionStyle);
         yPos += 40;
 
-        // Transcription Method
-        var lblTranscriptionMethod = new Label { Text = "Transcription:", Location = new Point(10, yPos), AutoSize = true };
+        // Transcription Method - Modern UI
+        var lblTranscriptionMethod = new Label {
+            Text = "Transcription:",
+            Location = new Point(10, yPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
         cmbTranscriptionMethod = new ComboBox {
             Location = new Point(120, yPos),
             Size = new Size(200, 25),
-            DropDownStyle = ComboBoxStyle.DropDownList
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            FlatStyle = FlatStyle.Flat
         };
         cmbTranscriptionMethod.Items.AddRange(new object[] { "Whisper (Local)", "Whisper (OpenAI API)", "Manual SRT File" });
         cmbTranscriptionMethod.SelectedIndex = 0;
@@ -297,30 +491,37 @@ partial class MainForm
         captionsPanel.Controls.Add(cmbTranscriptionMethod);
         yPos += 40;
 
-        // Generate Captions Button
-        btnGenerateCaptions = new Button {
-            Text = "Generate Captions",
+        // Generate Captions Button - Modern UI
+        btnGenerateCaptions = new ModernButton {
+            Text = "🎬 Generate Captions",
             Location = new Point(10, yPos),
             Size = new Size(220, 45),
-            Font = new Font("Segoe UI", 10, FontStyle.Bold),
-            AutoSize = false
+            Style = ModernButton.ButtonStyle.Primary,
+            BorderRadius = BorderRadius.MD
         };
         btnGenerateCaptions.Click += BtnGenerateCaptions_Click;
         captionsPanel.Controls.Add(btnGenerateCaptions);
         yPos += 60;
 
-        // Progress Bar
-        progressBarCaptions = new ProgressBar {
+        // Progress Bar - Modern UI
+        progressBarCaptions = new ModernProgressBar {
             Location = new Point(10, yPos),
-            Size = new Size(900, 25),
-            Style = ProgressBarStyle.Marquee,
-            Visible = false
+            Size = new Size(900, 30),
+            Visible = false,
+            ShowPercentage = true,
+            BarHeight = 30
         };
         captionsPanel.Controls.Add(progressBarCaptions);
-        yPos += 35;
+        yPos += 40;
 
-        // Log
-        var lblCaptionsLog = new Label { Text = "Log:", Location = new Point(10, yPos), AutoSize = true };
+        // Log - Modern UI
+        var lblCaptionsLog = new Label {
+            Text = "Log:",
+            Location = new Point(10, yPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
         captionsPanel.Controls.Add(lblCaptionsLog);
         yPos += 25;
 
@@ -330,7 +531,10 @@ partial class MainForm
             Multiline = true,
             ScrollBars = ScrollBars.Vertical,
             ReadOnly = true,
-            Font = new Font("Consola", 9)
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle,
+            Font = ModernFonts.Code
         };
         captionsPanel.Controls.Add(txtCaptionsLog);
 
@@ -342,18 +546,29 @@ partial class MainForm
 
         yPos = 10;
         
-        // AI Provider Selection
+        // AI Provider Selection - Modern UI
         var grpAiProvider = new GroupBox {
             Text = "AI Script Generator",
             Location = new Point(10, yPos),
-            Size = new Size(600, 280)
+            Size = new Size(600, 280),
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.H4
         };
         
-        var lblAiProvider = new Label { Text = "Provider:", Location = new Point(10, 25), AutoSize = true };
+        var lblAiProvider = new Label {
+            Text = "Provider:",
+            Location = new Point(10, 25),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
         cmbAiProvider = new ComboBox {
             Location = new Point(100, 22),
             Size = new Size(200, 25),
-            DropDownStyle = ComboBoxStyle.DropDownList
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            FlatStyle = FlatStyle.Flat
         };
         cmbAiProvider.Items.AddRange(new object[] { "Ollama (Local)", "OpenAI", "Anthropic Claude", "Google Gemini" });
         cmbAiProvider.SelectedIndex = 0;
@@ -364,122 +579,258 @@ partial class MainForm
         
         int aiYPos = 55;
         
-        // Ollama Settings
-        var lblOllamaUrl = new Label { Text = "Ollama URL:", Location = new Point(10, aiYPos), AutoSize = true };
-        txtOllamaUrl = new TextBox { Location = new Point(150, aiYPos), Size = new Size(430, 25) };
+        // Ollama Settings - Modern UI
+        var lblOllamaUrl = new Label {
+            Text = "Ollama URL:",
+            Location = new Point(10, aiYPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtOllamaUrl = new TextBox {
+            Location = new Point(150, aiYPos),
+            Size = new Size(430, 25),
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
+        };
         grpAiProvider.Controls.Add(lblOllamaUrl);
         grpAiProvider.Controls.Add(txtOllamaUrl);
         aiYPos += 30;
 
-        var lblOllamaModel = new Label { Text = "Ollama Model:", Location = new Point(10, aiYPos), AutoSize = true };
-        txtOllamaModel = new TextBox { Location = new Point(150, aiYPos), Size = new Size(430, 25) };
+        var lblOllamaModel = new Label {
+            Text = "Ollama Model:",
+            Location = new Point(10, aiYPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtOllamaModel = new TextBox {
+            Location = new Point(150, aiYPos),
+            Size = new Size(430, 25),
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
+        };
         grpAiProvider.Controls.Add(lblOllamaModel);
         grpAiProvider.Controls.Add(txtOllamaModel);
         aiYPos += 35;
         
-        // OpenAI Settings
-        var lblOpenAiKey = new Label { Text = "OpenAI API Key:", Location = new Point(10, aiYPos), AutoSize = true };
-        txtOpenAiApiKey = new TextBox { Location = new Point(150, aiYPos), Size = new Size(350, 25), UseSystemPasswordChar = true };
-        var btnTestOpenAI = new Button {
+        // OpenAI Settings - Modern UI
+        var lblOpenAiKey = new Label {
+            Text = "OpenAI API Key:",
+            Location = new Point(10, aiYPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtOpenAiApiKey = new TextBox {
+            Location = new Point(150, aiYPos),
+            Size = new Size(350, 25),
+            UseSystemPasswordChar = true,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
+        };
+        var btnTestOpenAI = new ModernButton {
             Text = "Test",
             Location = new Point(510, aiYPos - 2),
             Size = new Size(70, 28),
-            BackColor = ThemeColors.Dark.Primary,
-            ForeColor = Color.White,
-            FlatStyle = FlatStyle.Flat
+            Style = ModernButton.ButtonStyle.Success,
+            BorderRadius = BorderRadius.SM
         };
-        btnTestOpenAI.FlatAppearance.BorderSize = 0;
         btnTestOpenAI.Click += async (s, e) => await TestApiConnection("openai");
         grpAiProvider.Controls.Add(lblOpenAiKey);
         grpAiProvider.Controls.Add(txtOpenAiApiKey);
         grpAiProvider.Controls.Add(btnTestOpenAI);
         aiYPos += 30;
         
-        var lblOpenAiModel = new Label { Text = "OpenAI Model:", Location = new Point(10, aiYPos), AutoSize = true };
-        txtOpenAiModel = new TextBox { Location = new Point(150, aiYPos), Size = new Size(430, 25), Text = "gpt-4" };
+        var lblOpenAiModel = new Label {
+            Text = "OpenAI Model:",
+            Location = new Point(10, aiYPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtOpenAiModel = new TextBox {
+            Location = new Point(150, aiYPos),
+            Size = new Size(430, 25),
+            Text = "gpt-4",
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
+        };
         grpAiProvider.Controls.Add(lblOpenAiModel);
         grpAiProvider.Controls.Add(txtOpenAiModel);
         aiYPos += 35;
         
-        // Anthropic Settings
-        var lblAnthropicKey = new Label { Text = "Anthropic API Key:", Location = new Point(10, aiYPos), AutoSize = true };
-        txtAnthropicApiKey = new TextBox { Location = new Point(150, aiYPos), Size = new Size(350, 25), UseSystemPasswordChar = true };
-        var btnTestAnthropic = new Button {
+        // Anthropic Settings - Modern UI
+        var lblAnthropicKey = new Label {
+            Text = "Anthropic API Key:",
+            Location = new Point(10, aiYPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtAnthropicApiKey = new TextBox {
+            Location = new Point(150, aiYPos),
+            Size = new Size(350, 25),
+            UseSystemPasswordChar = true,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
+        };
+        var btnTestAnthropic = new ModernButton {
             Text = "Test",
             Location = new Point(510, aiYPos - 2),
             Size = new Size(70, 28),
-            BackColor = ThemeColors.Dark.Primary,
-            ForeColor = Color.White,
-            FlatStyle = FlatStyle.Flat
+            Style = ModernButton.ButtonStyle.Success,
+            BorderRadius = BorderRadius.SM
         };
-        btnTestAnthropic.FlatAppearance.BorderSize = 0;
         btnTestAnthropic.Click += async (s, e) => await TestApiConnection("anthropic");
         grpAiProvider.Controls.Add(lblAnthropicKey);
         grpAiProvider.Controls.Add(txtAnthropicApiKey);
         grpAiProvider.Controls.Add(btnTestAnthropic);
         aiYPos += 30;
         
-        var lblAnthropicModel = new Label { Text = "Anthropic Model:", Location = new Point(10, aiYPos), AutoSize = true };
-        txtAnthropicModel = new TextBox { Location = new Point(150, aiYPos), Size = new Size(430, 25), Text = "claude-3-5-sonnet-20241022" };
+        var lblAnthropicModel = new Label {
+            Text = "Anthropic Model:",
+            Location = new Point(10, aiYPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtAnthropicModel = new TextBox {
+            Location = new Point(150, aiYPos),
+            Size = new Size(430, 25),
+            Text = "claude-3-5-sonnet-20241022",
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
+        };
         grpAiProvider.Controls.Add(lblAnthropicModel);
         grpAiProvider.Controls.Add(txtAnthropicModel);
         aiYPos += 35;
         
-        // Gemini Settings
-        var lblGeminiKey = new Label { Text = "Gemini API Key:", Location = new Point(10, aiYPos), AutoSize = true };
-        txtGeminiApiKey = new TextBox { Location = new Point(150, aiYPos), Size = new Size(350, 25), UseSystemPasswordChar = true };
-        var btnTestGemini = new Button {
+        // Gemini Settings - Modern UI
+        var lblGeminiKey = new Label {
+            Text = "Gemini API Key:",
+            Location = new Point(10, aiYPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtGeminiApiKey = new TextBox {
+            Location = new Point(150, aiYPos),
+            Size = new Size(350, 25),
+            UseSystemPasswordChar = true,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
+        };
+        var btnTestGemini = new ModernButton {
             Text = "Test",
             Location = new Point(510, aiYPos - 2),
             Size = new Size(70, 28),
-            BackColor = ThemeColors.Dark.Primary,
-            ForeColor = Color.White,
-            FlatStyle = FlatStyle.Flat
+            Style = ModernButton.ButtonStyle.Success,
+            BorderRadius = BorderRadius.SM
         };
-        btnTestGemini.FlatAppearance.BorderSize = 0;
         btnTestGemini.Click += async (s, e) => await TestApiConnection("gemini");
         grpAiProvider.Controls.Add(lblGeminiKey);
         grpAiProvider.Controls.Add(txtGeminiApiKey);
         grpAiProvider.Controls.Add(btnTestGemini);
         aiYPos += 30;
         
-        var lblGeminiModel = new Label { Text = "Gemini Model:", Location = new Point(10, aiYPos), AutoSize = true };
-        txtGeminiModel = new TextBox { Location = new Point(150, aiYPos), Size = new Size(430, 25), Text = "gemini-1.5-pro" };
+        var lblGeminiModel = new Label {
+            Text = "Gemini Model:",
+            Location = new Point(10, aiYPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtGeminiModel = new TextBox {
+            Location = new Point(150, aiYPos),
+            Size = new Size(430, 25),
+            Text = "gemini-1.5-pro",
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
+        };
         grpAiProvider.Controls.Add(lblGeminiModel);
         grpAiProvider.Controls.Add(txtGeminiModel);
         
         settingsPanel.Controls.Add(grpAiProvider);
         yPos += 290;
 
-        var lblPiperPath = new Label { Text = "Piper Path:", Location = new Point(10, yPos), AutoSize = true };
-        txtPiperPath = new TextBox { Location = new Point(200, yPos), Size = new Size(400, 25) };
+        var lblPiperPath = new Label {
+            Text = "Piper Path:",
+            Location = new Point(10, yPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtPiperPath = new TextBox {
+            Location = new Point(200, yPos),
+            Size = new Size(400, 25),
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
+        };
         settingsPanel.Controls.Add(lblPiperPath);
         settingsPanel.Controls.Add(txtPiperPath);
         yPos += 35;
 
-        var lblPiperModel = new Label { Text = "Piper Model Path:", Location = new Point(10, yPos), AutoSize = true };
-        txtPiperModel = new TextBox { Location = new Point(200, yPos), Size = new Size(400, 25) };
+        var lblPiperModel = new Label {
+            Text = "Piper Model Path:",
+            Location = new Point(10, yPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtPiperModel = new TextBox {
+            Location = new Point(200, yPos),
+            Size = new Size(400, 25),
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
+        };
         settingsPanel.Controls.Add(lblPiperModel);
         settingsPanel.Controls.Add(txtPiperModel);
         yPos += 35;
 
-        var lblFFmpegPath = new Label { Text = "FFmpeg Path:", Location = new Point(10, yPos), AutoSize = true };
-        txtFFmpegPath = new TextBox { Location = new Point(200, yPos), Size = new Size(400, 25) };
+        var lblFFmpegPath = new Label {
+            Text = "FFmpeg Path:",
+            Location = new Point(10, yPos),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
+        txtFFmpegPath = new TextBox {
+            Location = new Point(200, yPos),
+            Size = new Size(400, 25),
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
+        };
         settingsPanel.Controls.Add(lblFFmpegPath);
         settingsPanel.Controls.Add(txtFFmpegPath);
         yPos += 35;
 
-        // Unsplash API Section
+        // Unsplash API Section - Modern UI
         var grpUnsplash = new GroupBox {
             Text = "Unsplash Image Generation (Optional)",
             Location = new Point(10, yPos),
-            Size = new Size(600, 110)
+            Size = new Size(600, 110),
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.H4
         };
         
         chkUseUnsplash = new CheckBox {
             Text = "Enable automatic image generation from Unsplash",
             Location = new Point(10, 25),
-            Size = new Size(580, 20)
+            Size = new Size(580, 20),
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
         };
         chkUseUnsplash.CheckedChanged += (s, e) => {
             txtUnsplashApiKey.Enabled = chkUseUnsplash.Checked;
@@ -488,20 +839,25 @@ partial class MainForm
         var lblUnsplashKey = new Label {
             Text = "API Key:",
             Location = new Point(10, 55),
-            AutoSize = true
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
         };
         
         txtUnsplashApiKey = new TextBox {
             Location = new Point(80, 52),
             Size = new Size(500, 25),
-            Enabled = false
+            Enabled = false,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
         };
         
         var lblUnsplashInfo = new Label {
             Text = "Get your free API key at: https://unsplash.com/developers",
             Location = new Point(10, 82),
             Size = new Size(580, 20),
-            ForeColor = Color.DarkBlue
+            ForeColor = ModernTheme.Accent
         };
         
         grpUnsplash.Controls.AddRange(new Control[] {
@@ -510,17 +866,21 @@ partial class MainForm
         settingsPanel.Controls.Add(grpUnsplash);
         yPos += 120;
 
-        // GPU Acceleration Section (Dark Mode is always enabled)
+        // GPU Acceleration Section - Modern UI
         var grpGpuSettings = new GroupBox {
             Text = "Video Encoding Settings",
             Location = new Point(10, yPos),
-            Size = new Size(600, 100)
+            Size = new Size(600, 100),
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.H4
         };
         
         chkUseGpu = new CheckBox {
             Text = "Enable GPU Acceleration (faster encoding, requires compatible GPU)",
             Location = new Point(10, 25),
-            AutoSize = true
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
         };
         chkUseGpu.CheckedChanged += (s, e) => {
             cmbGpuEncoder.Enabled = chkUseGpu.Checked;
@@ -529,13 +889,18 @@ partial class MainForm
         var lblGpuEncoder = new Label {
             Text = "GPU Encoder:",
             Location = new Point(10, 55),
-            AutoSize = true
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
         };
         
         cmbGpuEncoder = new ComboBox {
             Location = new Point(120, 52),
             Size = new Size(200, 25),
-            DropDownStyle = ComboBoxStyle.DropDownList
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            FlatStyle = FlatStyle.Flat
         };
         cmbGpuEncoder.Items.AddRange(new object[] { "auto", "nvidia", "amd", "intel", "apple" });
         cmbGpuEncoder.SelectedIndex = 0;
@@ -547,67 +912,135 @@ partial class MainForm
         settingsPanel.Controls.Add(grpGpuSettings);
         yPos += 110;
 
-        // Video Output Settings Section
+        // Video Output Settings Section - Modern UI
         var grpVideoOutput = new GroupBox {
             Text = "Video Output Settings",
             Location = new Point(10, yPos),
-            Size = new Size(600, 180)
+            Size = new Size(600, 180),
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.H4
         };
 
-        var lblResolution = new Label { Text = "Resolution:", Location = new Point(10, 25), AutoSize = true };
+        var lblResolution = new Label {
+            Text = "Resolution:",
+            Location = new Point(10, 25),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
         cmbResolution = new ComboBox {
             Location = new Point(120, 22),
             Size = new Size(150, 25),
-            DropDownStyle = ComboBoxStyle.DropDownList
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            FlatStyle = FlatStyle.Flat
         };
         cmbResolution.Items.AddRange(new object[] { "720p", "1080p", "1440p", "4K" });
         cmbResolution.SelectedIndex = 1; // 1080p default
 
-        var lblQuality = new Label { Text = "Quality Preset:", Location = new Point(300, 25), AutoSize = true };
+        var lblQuality = new Label {
+            Text = "Quality Preset:",
+            Location = new Point(300, 25),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
         cmbQuality = new ComboBox {
             Location = new Point(410, 22),
             Size = new Size(150, 25),
-            DropDownStyle = ComboBoxStyle.DropDownList
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            FlatStyle = FlatStyle.Flat
         };
         cmbQuality.Items.AddRange(new object[] { "Low", "Medium", "High", "Ultra" });
         cmbQuality.SelectedIndex = 1; // Medium default
 
-        var lblFrameRate = new Label { Text = "Frame Rate:", Location = new Point(10, 60), AutoSize = true };
+        var lblFrameRate = new Label {
+            Text = "Frame Rate:",
+            Location = new Point(10, 60),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
         cmbFrameRate = new ComboBox {
             Location = new Point(120, 57),
             Size = new Size(150, 25),
-            DropDownStyle = ComboBoxStyle.DropDownList
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            FlatStyle = FlatStyle.Flat
         };
         cmbFrameRate.Items.AddRange(new object[] { "24 fps", "30 fps", "60 fps" });
         cmbFrameRate.SelectedIndex = 1; // 30 fps default
 
-        var lblVideoBitrate = new Label { Text = "Video Bitrate:", Location = new Point(300, 60), AutoSize = true };
+        var lblVideoBitrate = new Label {
+            Text = "Video Bitrate:",
+            Location = new Point(300, 60),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
         numVideoBitrate = new NumericUpDown {
             Location = new Point(410, 57),
             Size = new Size(100, 25),
             Minimum = 1000,
             Maximum = 50000,
             Value = 5000,
-            Increment = 500
+            Increment = 500,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
         };
-        var lblVideoBitrateUnit = new Label { Text = "kbps", Location = new Point(515, 60), AutoSize = true };
+        var lblVideoBitrateUnit = new Label {
+            Text = "kbps",
+            Location = new Point(515, 60),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
 
-        var lblAudioBitrate = new Label { Text = "Audio Bitrate:", Location = new Point(10, 95), AutoSize = true };
+        var lblAudioBitrate = new Label {
+            Text = "Audio Bitrate:",
+            Location = new Point(10, 95),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
         numAudioBitrate = new NumericUpDown {
             Location = new Point(120, 92),
             Size = new Size(100, 25),
             Minimum = 64,
             Maximum = 320,
             Value = 192,
-            Increment = 32
+            Increment = 32,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
         };
-        var lblAudioBitrateUnit = new Label { Text = "kbps", Location = new Point(225, 95), AutoSize = true };
+        var lblAudioBitrateUnit = new Label {
+            Text = "kbps",
+            Location = new Point(225, 95),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
 
-        var lblAudioChannels = new Label { Text = "Audio Channels:", Location = new Point(300, 95), AutoSize = true };
+        var lblAudioChannels = new Label {
+            Text = "Audio Channels:",
+            Location = new Point(300, 95),
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
+        };
         cmbAudioChannels = new ComboBox {
             Location = new Point(410, 92),
             Size = new Size(150, 25),
-            DropDownStyle = ComboBoxStyle.DropDownList
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            FlatStyle = FlatStyle.Flat
         };
         cmbAudioChannels.Items.AddRange(new object[] { "Mono", "Stereo" });
         cmbAudioChannels.SelectedIndex = 1; // Stereo default
@@ -616,7 +1049,8 @@ partial class MainForm
             Text = "Higher settings = better quality but larger file sizes",
             Location = new Point(10, 130),
             Size = new Size(580, 40),
-            ForeColor = Color.DarkGreen
+            ForeColor = ModernTheme.Success,
+            Font = ModernFonts.Small
         };
 
         grpVideoOutput.Controls.AddRange(new Control[] {
@@ -628,30 +1062,25 @@ partial class MainForm
         settingsPanel.Controls.Add(grpVideoOutput);
         yPos += 190;
 
-        btnSaveSettings = new Button {
-            Text = "Save Settings",
-            Location = new Point(200, yPos),
-            Size = new Size(150, 35)
-        };
-        btnSaveSettings.Click += BtnSaveSettings_Click;
-        settingsPanel.Controls.Add(btnSaveSettings);
-        
-        // Add info label
+        // GPU info label - Modern UI
         var lblGpuInfo = new Label {
             Text = "Note: GPU acceleration requires FFmpeg with GPU support and compatible hardware.\n" +
                    "CPU encoding is more compatible but slower. GPU encoding is 3-10x faster.",
-            Location = new Point(10, yPos + 45),
+            Location = new Point(10, yPos),
             Size = new Size(600, 40),
-            ForeColor = Color.DarkBlue
+            ForeColor = ModernTheme.Accent,
+            Font = ModernFonts.Small
         };
         settingsPanel.Controls.Add(lblGpuInfo);
-        yPos += 100;
+        yPos += 50;
 
-        // Animation Settings Section
+        // Animation Settings Section - Modern UI
         var grpAnimationSettings = new GroupBox {
             Text = "Video Animation Settings",
             Location = new Point(10, yPos),
-            Size = new Size(600, 180)
+            Size = new Size(600, 180),
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.H4
         };
         
         int animYPos = 25;
@@ -660,7 +1089,9 @@ partial class MainForm
             Text = "Enable Ken Burns Effect (zoom/pan on images)",
             Location = new Point(10, animYPos),
             Size = new Size(580, 20),
-            Checked = true
+            Checked = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
         };
         grpAnimationSettings.Controls.Add(chkEnableKenBurns);
         animYPos += 30;
@@ -669,7 +1100,9 @@ partial class MainForm
             Text = "Enable Crossfade Transitions between images",
             Location = new Point(10, animYPos),
             Size = new Size(580, 20),
-            Checked = true
+            Checked = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
         };
         grpAnimationSettings.Controls.Add(chkEnableCrossfade);
         animYPos += 30;
@@ -677,7 +1110,9 @@ partial class MainForm
         var lblTransitionDuration = new Label {
             Text = "Transition Duration (seconds):",
             Location = new Point(10, animYPos + 3),
-            AutoSize = true
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
         };
         numTransitionDuration = new NumericUpDown {
             Location = new Point(220, animYPos),
@@ -686,7 +1121,10 @@ partial class MainForm
             Maximum = 5.0m,
             DecimalPlaces = 1,
             Increment = 0.1m,
-            Value = 1.0m
+            Value = 1.0m,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
         };
         grpAnimationSettings.Controls.Add(lblTransitionDuration);
         grpAnimationSettings.Controls.Add(numTransitionDuration);
@@ -695,7 +1133,9 @@ partial class MainForm
         var lblZoomIntensity = new Label {
             Text = "Zoom Intensity (1.0 = no zoom, 1.5 = 50% zoom):",
             Location = new Point(10, animYPos + 3),
-            AutoSize = true
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
         };
         numZoomIntensity = new NumericUpDown {
             Location = new Point(320, animYPos),
@@ -704,7 +1144,10 @@ partial class MainForm
             Maximum = 2.0m,
             DecimalPlaces = 1,
             Increment = 0.1m,
-            Value = 1.2m
+            Value = 1.2m,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
         };
         grpAnimationSettings.Controls.Add(lblZoomIntensity);
         grpAnimationSettings.Controls.Add(numZoomIntensity);
@@ -712,11 +1155,13 @@ partial class MainForm
         settingsPanel.Controls.Add(grpAnimationSettings);
         yPos += 190;
 
-        // Whisper Settings Section
+        // Whisper Settings Section - Modern UI
         var grpWhisperSettings = new GroupBox {
             Text = "Whisper (Caption) Settings",
             Location = new Point(10, yPos),
-            Size = new Size(600, 140)
+            Size = new Size(600, 140),
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.H4
         };
         
         int whisperYPos = 25;
@@ -724,12 +1169,17 @@ partial class MainForm
         var lblWhisperPath = new Label {
             Text = "Whisper Command:",
             Location = new Point(10, whisperYPos + 3),
-            AutoSize = true
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
         };
         txtWhisperPath = new TextBox {
             Location = new Point(150, whisperYPos),
             Size = new Size(430, 25),
-            Text = "whisper"
+            Text = "whisper",
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle
         };
         grpWhisperSettings.Controls.Add(lblWhisperPath);
         grpWhisperSettings.Controls.Add(txtWhisperPath);
@@ -738,12 +1188,17 @@ partial class MainForm
         var lblWhisperModel = new Label {
             Text = "Whisper Model:",
             Location = new Point(10, whisperYPos + 3),
-            AutoSize = true
+            AutoSize = true,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
         };
         cmbWhisperModel = new ComboBox {
             Location = new Point(150, whisperYPos),
             Size = new Size(200, 25),
-            DropDownStyle = ComboBoxStyle.DropDownList
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            FlatStyle = FlatStyle.Flat
         };
         cmbWhisperModel.Items.AddRange(new object[] { "tiny", "base", "small", "medium", "large" });
         cmbWhisperModel.SelectedIndex = 1; // base
@@ -755,25 +1210,23 @@ partial class MainForm
             Text = "Use OpenAI Whisper API (requires OpenAI API key above)",
             Location = new Point(10, whisperYPos),
             Size = new Size(580, 20),
-            Checked = false
+            Checked = false,
+            ForeColor = ModernTheme.TextPrimary,
+            Font = ModernFonts.Body
         };
         grpWhisperSettings.Controls.Add(chkUseWhisperApi);
         
         settingsPanel.Controls.Add(grpWhisperSettings);
         yPos += 150;
 
-        // Save Settings Button
-        btnSaveSettings = new Button {
-            Text = "Save All Settings",
+        // Save Settings Button - Modern UI
+        btnSaveSettings = new ModernButton {
+            Text = "💾 Save All Settings",
             Location = new Point(10, yPos),
             Size = new Size(200, 40),
-            Font = new Font("Segoe UI", 10, FontStyle.Bold),
-            BackColor = ThemeColors.Dark.Primary,
-            ForeColor = Color.White,
-            FlatStyle = FlatStyle.Flat,
-            Cursor = Cursors.Hand
+            Style = ModernButton.ButtonStyle.Success,
+            BorderRadius = BorderRadius.MD
         };
-        btnSaveSettings.FlatAppearance.BorderSize = 0;
         btnSaveSettings.Click += BtnSaveSettings_Click;
         settingsPanel.Controls.Add(btnSaveSettings);
 
@@ -781,29 +1234,34 @@ partial class MainForm
         var statusPanel = new Panel { Dock = DockStyle.Fill, Padding = new Padding(20) };
         tabStatus.Controls.Add(statusPanel);
 
-        var lblStatusTitle = new Label { 
-            Text = "System Status - Check if all required tools are installed", 
-            Location = new Point(10, 10), 
+        var lblStatusTitle = new Label {
+            Text = "System Status - Check if all required tools are installed",
+            Location = new Point(10, 10),
             AutoSize = true,
-            Font = new Font("Segoe UI", 10, FontStyle.Bold)
+            Font = ModernFonts.H3,
+            ForeColor = ModernTheme.TextPrimary
         };
         statusPanel.Controls.Add(lblStatusTitle);
 
-        txtSystemStatus = new TextBox { 
-            Location = new Point(10, 40), 
+        txtSystemStatus = new TextBox {
+            Location = new Point(10, 40),
             Size = new Size(900, 400),
             Multiline = true,
             ScrollBars = ScrollBars.Vertical,
             ReadOnly = true,
-            BackColor = Color.White,
-            Font = new Font("Consolas", 10)
+            BackColor = ModernTheme.Surface,
+            ForeColor = ModernTheme.TextPrimary,
+            BorderStyle = BorderStyle.FixedSingle,
+            Font = ModernFonts.Code
         };
         statusPanel.Controls.Add(txtSystemStatus);
 
-        btnCheckStatus = new Button {
-            Text = "Check System Status",
+        btnCheckStatus = new ModernButton {
+            Text = "🔍 Check System Status",
             Location = new Point(10, 450),
-            Size = new Size(200, 35)
+            Size = new Size(200, 35),
+            Style = ModernButton.ButtonStyle.Primary,
+            BorderRadius = BorderRadius.MD
         };
         btnCheckStatus.Click += BtnCheckStatus_Click;
         statusPanel.Controls.Add(btnCheckStatus);
@@ -816,7 +1274,8 @@ partial class MainForm
             Text = "Ollama Server Console - Live Output",
             Location = new Point(10, 10),
             AutoSize = true,
-            Font = new Font("Segoe UI", 10, FontStyle.Bold)
+            Font = ModernFonts.H3,
+            ForeColor = ModernTheme.TextPrimary
         };
         debugPanel.Controls.Add(lblDebugTitle);
 
@@ -828,7 +1287,8 @@ partial class MainForm
             ReadOnly = true,
             BackColor = Color.Black,
             ForeColor = Color.LimeGreen,
-            Font = new Font("Consolas", 9)
+            BorderStyle = BorderStyle.FixedSingle,
+            Font = ModernFonts.Code
         };
         debugPanel.Controls.Add(txtOllamaConsole);
 
@@ -838,30 +1298,33 @@ partial class MainForm
             FlowDirection = FlowDirection.LeftToRight
         };
 
-        btnStartOllama = new Button {
-            Text = "Start Ollama Server",
+        btnStartOllama = new ModernButton {
+            Text = "▶️ Start Ollama Server",
             Size = new Size(180, 40),
             Margin = new Padding(0, 0, 10, 0),
-            AutoSize = false
+            Style = ModernButton.ButtonStyle.Success,
+            BorderRadius = BorderRadius.SM
         };
         btnStartOllama.Click += BtnStartOllama_Click;
         buttonPanel.Controls.Add(btnStartOllama);
 
-        btnStopOllama = new Button {
-            Text = "Stop Ollama Server",
+        btnStopOllama = new ModernButton {
+            Text = "⏹️ Stop Ollama Server",
             Size = new Size(180, 40),
             Enabled = false,
             Margin = new Padding(0, 0, 10, 0),
-            AutoSize = false
+            Style = ModernButton.ButtonStyle.Danger,
+            BorderRadius = BorderRadius.SM
         };
         btnStopOllama.Click += BtnStopOllama_Click;
         buttonPanel.Controls.Add(btnStopOllama);
 
-        btnClearConsole = new Button {
-            Text = "Clear Console",
+        btnClearConsole = new ModernButton {
+            Text = "🗑️ Clear Console",
             Size = new Size(150, 40),
             Margin = new Padding(0, 0, 10, 0),
-            AutoSize = false
+            Style = ModernButton.ButtonStyle.Outline,
+            BorderRadius = BorderRadius.SM
         };
         btnClearConsole.Click += BtnClearConsole_Click;
         buttonPanel.Controls.Add(btnClearConsole);

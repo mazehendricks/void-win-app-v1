@@ -122,6 +122,13 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
     {
         progress?.Report("Concatenating audio files...");
 
+        // Handle single audio file case - no concatenation needed
+        if (audioFiles.Count == 1)
+        {
+            File.Copy(audioFiles[0], outputPath, true);
+            return;
+        }
+
         // Create concat file list
         var concatFile = Path.Combine(Path.GetTempPath(), $"ffmpeg_audio_concat_{Guid.NewGuid()}.txt");
         // Use forward slashes for FFmpeg compatibility on all platforms
@@ -144,11 +151,17 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
             };
 
             process.Start();
+            
+            // Read output asynchronously to prevent deadlocks
+            var errorTask = process.StandardError.ReadToEndAsync();
+            var outputTask = process.StandardOutput.ReadToEndAsync();
+            
             await process.WaitForExitAsync();
+            
+            var error = await errorTask;
 
             if (process.ExitCode != 0)
             {
-                var error = await process.StandardError.ReadToEndAsync();
                 throw new Exception($"FFmpeg audio concatenation failed: {error}");
             }
         }
@@ -249,11 +262,18 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
             progress?.Report($"FFmpeg command: {process.StartInfo.Arguments}");
             
             process.Start();
+            
+            // Read output asynchronously to prevent deadlocks
+            var errorTask = process.StandardError.ReadToEndAsync();
+            var outputTask = process.StandardOutput.ReadToEndAsync();
+            
             await process.WaitForExitAsync();
+            
+            var error = await errorTask;
+            var output = await outputTask;
 
             if (process.ExitCode != 0)
             {
-                var error = await process.StandardError.ReadToEndAsync();
                 throw new Exception($"FFmpeg video creation failed: {error}");
             }
         }
@@ -377,16 +397,21 @@ public class FFmpegVideoAssembly : IVideoAssemblyService
         };
 
         process.Start();
+        
+        // Read output asynchronously to prevent deadlocks
+        var errorTask = process.StandardError.ReadToEndAsync();
+        var outputTask = process.StandardOutput.ReadToEndAsync();
+        
         await process.WaitForExitAsync();
+        
+        var error = await errorTask;
 
-        if (File.Exists(placeholderPath))
+        if (process.ExitCode != 0 || !File.Exists(placeholderPath))
         {
-            imageFiles.Add(placeholderPath);
+            throw new Exception($"Failed to create placeholder image. Error: {error}. Please provide images in the visuals directory.");
         }
-        else
-        {
-            throw new Exception("Failed to create placeholder image. Please provide images in the visuals directory.");
-        }
+        
+        imageFiles.Add(placeholderPath);
         
         return imageFiles;
     }

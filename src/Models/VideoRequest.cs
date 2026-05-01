@@ -7,6 +7,8 @@ public class VideoRequest
 {
     public string Title { get; set; } = string.Empty;
     public string Topic { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public List<string> Keywords { get; set; } = new();
     public ChannelDNA ChannelDNA { get; set; } = new();
     public int TargetDurationSeconds { get; set; } = 60;
     public string OutputPath { get; set; } = "output";

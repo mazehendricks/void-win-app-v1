@@ -488,9 +488,9 @@ public partial class MainForm : Form
             // Get detailed Ollama diagnostics
             if (_scriptGenerator != null)
             {
-                txtSystemStatus.AppendText("\r\n=== OLLAMA DIAGNOSTICS ===\r\n\r\n");
-                var ollamaDiag = await _scriptGenerator.GetDiagnosticInfoAsync();
-                txtSystemStatus.AppendText($"{ollamaDiag}\r\n");
+                txtSystemStatus.AppendText("\r\n=== SCRIPT GENERATOR ===\r\n\r\n");
+                txtSystemStatus.AppendText($"Provider: {_config.AiProvider}\r\n");
+                txtSystemStatus.AppendText($"Status: {(await _scriptGenerator.IsAvailableAsync() ? "✓ Available" : "✗ Not Available")}\r\n");
             }
 
             txtSystemStatus.AppendText("\r\n=== CONFIGURATION ===\r\n\r\n");
@@ -614,18 +614,42 @@ public partial class MainForm : Form
 
     private void ApplyTheme(bool darkMode)
     {
-        var theme = darkMode ? ThemeColors.Dark : ThemeColors.Light;
+        var theme = darkMode ? (object)new
+        {
+            Background = ThemeColors.Dark.Background,
+            Surface = ThemeColors.Dark.Surface,
+            SurfaceVariant = ThemeColors.Dark.SurfaceVariant,
+            Text = ThemeColors.Dark.Text,
+            TextSecondary = ThemeColors.Dark.TextSecondary,
+            Primary = ThemeColors.Dark.Primary,
+            Border = ThemeColors.Dark.Border,
+            InputBackground = ThemeColors.Dark.InputBackground,
+            ButtonBackground = ThemeColors.Dark.ButtonBackground
+        } : new
+        {
+            Background = ThemeColors.Light.Background,
+            Surface = ThemeColors.Light.Surface,
+            SurfaceVariant = ThemeColors.Light.SurfaceVariant,
+            Text = ThemeColors.Light.Text,
+            TextSecondary = ThemeColors.Light.TextSecondary,
+            Primary = ThemeColors.Light.Primary,
+            Border = ThemeColors.Light.Border,
+            InputBackground = ThemeColors.Light.InputBackground,
+            ButtonBackground = ThemeColors.Light.ButtonBackground
+        };
 
         // Apply to form
-        this.BackColor = theme.Background;
-        this.ForeColor = theme.Text;
+        this.BackColor = ((dynamic)theme).Background;
+        this.ForeColor = ((dynamic)theme).Text;
 
         // Apply to all controls recursively
         ApplyThemeToControls(this.Controls, theme);
     }
 
-    private void ApplyThemeToControls(Control.ControlCollection controls, dynamic theme)
+    private void ApplyThemeToControls(Control.ControlCollection controls, object themeObj)
     {
+        dynamic theme = themeObj;
+        
         foreach (Control control in controls)
         {
             // Skip controls that should maintain their own colors

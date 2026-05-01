@@ -10,7 +10,7 @@ using VoidVideoGenerator.Models;
 /// </summary>
 public class ModernCard : Panel
 {
-    private int _borderRadius = BorderRadius.LG;
+    private int _borderRadius = 12; // BorderRadius.LG
     private bool _showBorder = true;
     private bool _showShadow = false;
     

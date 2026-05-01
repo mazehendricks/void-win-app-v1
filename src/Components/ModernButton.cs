@@ -23,7 +23,7 @@ public class ModernButton : Button
     private ButtonStyle _style = ButtonStyle.Primary;
     private bool _isHovered = false;
     private bool _isPressed = false;
-    private int _borderRadius = BorderRadius.MD;
+    private int _borderRadius = 8; // BorderRadius.MD
     
     public ModernButton()
     {

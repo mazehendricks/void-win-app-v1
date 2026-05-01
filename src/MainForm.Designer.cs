@@ -279,7 +279,7 @@ partial class MainForm
             Text = "Add images to use in your video. Images will be displayed in order during the video.",
             Location = new Point(10, 25),
             Size = new Size(880, 20),
-            ForeColor = ModernTheme.Accent
+            ForeColor = ModernTheme.TextSecondary
         };
         
         lstVisuals = new ListBox {
@@ -857,7 +857,7 @@ partial class MainForm
             Text = "Get your free API key at: https://unsplash.com/developers",
             Location = new Point(10, 82),
             Size = new Size(580, 20),
-            ForeColor = ModernTheme.Accent
+            ForeColor = ModernTheme.TextSecondary
         };
         
         grpUnsplash.Controls.AddRange(new Control[] {
@@ -1068,7 +1068,7 @@ partial class MainForm
                    "CPU encoding is more compatible but slower. GPU encoding is 3-10x faster.",
             Location = new Point(10, yPos),
             Size = new Size(600, 40),
-            ForeColor = ModernTheme.Accent,
+            ForeColor = ModernTheme.TextSecondary,
             Font = ModernFonts.Small
         };
         settingsPanel.Controls.Add(lblGpuInfo);
@@ -1360,7 +1360,7 @@ partial class MainForm
     private Button btnRemoveImages;
     private Button btnClearImages;
     private Button btnGenerate;
-    private ProgressBar progressBar;
+    private ModernProgressBar progressBar;
     private TextBox txtLog;
     
     // Settings Tab Controls
@@ -1403,7 +1403,7 @@ partial class MainForm
     private ComboBox cmbCaptionStyle;
     private ComboBox cmbTranscriptionMethod;
     private Button btnGenerateCaptions;
-    private ProgressBar progressBarCaptions;
+    private ModernProgressBar progressBarCaptions;
     private TextBox txtCaptionsLog;
     
     // Status Tab Controls

@@ -10,7 +10,7 @@ Write-Host "=========================================" -ForegroundColor Cyan
 Write-Host ""
 
 # Configuration
-$PIPER_VERSION = "v1.2.0"
+$PIPER_VERSION = "2023.11.14-2"
 $PIPER_URL = "https://github.com/rhasspy/piper/releases/download/$PIPER_VERSION/piper_windows_amd64.zip"
 $INSTALL_DIR = "C:\Tools\piper"
 $MODELS_DIR = "$INSTALL_DIR\models"

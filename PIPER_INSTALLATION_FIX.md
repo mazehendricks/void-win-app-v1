@@ -1,112 +1,69 @@
-# Piper TTS Installation Fix Guide
+# Piper TTS Installation Fix
 
-## Problem
-You encountered the error: `Central Directory corrupt` when trying to install Piper TTS using the `install-piper.bat` script.
+## Issue
+The Piper TTS installation scripts were failing with a 404 error because they were trying to download from an outdated release version.
+
+### Error Message
+```
+curl: (22) The requested URL returned error: 404
+ERROR: Failed to download Piper after 3 attempts
+URL: https://github.com/rhasspy/piper/releases/download/v1.2.0/piper_windows_amd64.zip
+```
 
 ## Root Cause
-This error occurs when:
-1. The ZIP file download was interrupted or incomplete
-2. Network issues caused file corruption during download
-3. The GitHub release server had temporary issues
-4. Antivirus software interfered with the download
+The scripts were configured to download Piper version `v1.2.0`, which doesn't exist in the GitHub releases. The actual latest version is `2023.11.14-2`.
 
-## Solutions
+## Solution
+Updated all three installation scripts with the correct version:
 
-### Solution 1: Use the Improved PowerShell Script (Recommended)
-I've created an improved PowerShell script with better error handling and retry logic:
+### Files Updated
+1. **install-piper.bat** (Windows Batch)
+2. **install-piper.ps1** (Windows PowerShell)
+3. **install-piper.sh** (Linux/Codespaces)
 
+### Changes Made
+Changed the version from:
+```
+PIPER_VERSION="v1.2.0"
+```
+
+To:
+```
+PIPER_VERSION="2023.11.14-2"
+```
+
+## How to Use
+
+### Windows (Batch Script)
+```cmd
+install-piper.bat
+```
+
+### Windows (PowerShell)
 ```powershell
 powershell -ExecutionPolicy Bypass -File install-piper.ps1
 ```
 
-**Benefits:**
-- Automatic retry on download failure (up to 3 attempts)
-- ZIP file validation before extraction
-- Better error messages and troubleshooting guidance
-- Automatic cleanup of corrupted files
-- Progress indicators
-
-### Solution 2: Use the Updated Batch Script
-The updated `install-piper.bat` now includes:
-- Download retry logic
-- File size validation
-- Better ZIP extraction method
-- Automatic cleanup of corrupted downloads
-
-Simply run:
-```batch
-install-piper.bat
+### Linux/Codespaces
+```bash
+chmod +x install-piper.sh
+./install-piper.sh
 ```
 
-### Solution 3: Manual Installation
-If both scripts fail, install manually:
+## What Gets Installed
 
-#### Step 1: Download Piper
-1. Go to: https://github.com/rhasspy/piper/releases/tag/v1.2.0
-2. Download: `piper_windows_amd64.zip`
-3. Save to a location you can find (e.g., Downloads folder)
+### Windows
+- **Piper executable**: `C:\Tools\piper\piper.exe`
+- **Voice model**: `C:\Tools\piper\models\voice.onnx`
+- **Model config**: `C:\Tools\piper\models\voice.onnx.json`
 
-#### Step 2: Verify Download
-- Check the file size (should be ~10-20 MB)
-- If it's very small (< 1 MB), the download failed - try again
-
-#### Step 3: Extract Files
-1. Right-click the ZIP file
-2. Select "Extract All..."
-3. Choose destination: `C:\Tools\piper`
-4. Click "Extract"
-
-**If extraction fails:**
-- Try using 7-Zip or WinRAR instead of Windows built-in extractor
-- Re-download the file (it may be corrupted)
-
-#### Step 4: Download Voice Model
-1. Create folder: `C:\Tools\piper\models`
-2. Download these files:
-   - https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx
-   - https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json
-3. Save both files to `C:\Tools\piper\models\` and rename:
-   - `en_US-lessac-medium.onnx` → `voice.onnx`
-   - `en_US-lessac-medium.onnx.json` → `voice.onnx.json`
-
-#### Step 5: Test Installation
-Open Command Prompt and run:
-```batch
-C:\Tools\piper\piper.exe --version
-```
-
-If successful, test voice generation:
-```batch
-echo Hello world | C:\Tools\piper\piper.exe --model C:\Tools\piper\models\voice.onnx --output_file test.wav
-```
-
-### Solution 4: Clean Up and Retry
-If you've tried before and it failed:
-
-1. **Delete corrupted files:**
-   ```batch
-   del %TEMP%\piper.zip
-   rmdir /S /Q %TEMP%\piper
-   ```
-
-2. **Clear browser/download cache** (if downloading manually)
-
-3. **Temporarily disable antivirus** (it may be blocking the download)
-
-4. **Try a different network** (if possible)
-
-5. **Run the script again:**
-   ```batch
-   install-piper.bat
-   ```
-   or
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File install-piper.ps1
-   ```
+### Linux
+- **Piper executable**: `~/.local/bin/piper` (or `/usr/local/bin/piper` if run with sudo)
+- **Voice model**: `./models/voice.onnx`
+- **Model config**: `./models/voice.onnx.json`
 
 ## Configuration
-
-After successful installation, update your `config.json`:
+After installation, update your `config.json`:
 
 ```json
 {
@@ -115,121 +72,45 @@ After successful installation, update your `config.json`:
 }
 ```
 
-## Alternative: Use Different TTS Service
-
-If Piper installation continues to fail, you can use alternative TTS services:
-
-### Option 1: Windows Built-in TTS
-Update your config.json:
+For Linux:
 ```json
 {
-  "VoiceGenerator": "Windows",
-  "UseWindowsTTS": true
+  "PiperPath": "piper",
+  "PiperModelPath": "models/voice.onnx"
 }
 ```
 
-### Option 2: Online TTS Services
-- Google Cloud Text-to-Speech
-- Amazon Polly
-- Microsoft Azure Speech
+## Verification
+The installation scripts automatically test the installation by:
+1. Running `piper --version` to verify the executable works
+2. Generating a test audio file (`test.wav`) to verify voice synthesis
 
-## Troubleshooting Common Issues
+If both tests pass, the installation is successful.
 
-### Issue: "Access Denied" Error
-**Solution:** Run the script as Administrator
-- Right-click `install-piper.bat` or `install-piper.ps1`
-- Select "Run as administrator"
+## Additional Voice Models
+The default installation includes the `en_US-lessac-medium` voice model. For more voice options, visit:
+- https://github.com/rhasspy/piper/blob/master/VOICES.md
+- https://huggingface.co/rhasspy/piper-voices
 
-### Issue: "curl not found"
-**Solution:** Update Windows or install curl
-- Windows 10 (1803+) and Windows 11 include curl
-- Or download from: https://curl.se/windows/
+## Troubleshooting
 
-### Issue: PowerShell Execution Policy Error
-**Solution:** Run with bypass flag
-```powershell
-powershell -ExecutionPolicy Bypass -File install-piper.ps1
-```
+### If Download Still Fails
+1. Check your internet connection
+2. Verify GitHub is accessible from your network
+3. Try downloading manually from: https://github.com/rhasspy/piper/releases/download/2023.11.14-2/piper_windows_amd64.zip
+4. Extract to `C:\Tools\piper` (Windows) or `~/.local/bin` (Linux)
 
-### Issue: Slow Download Speed
-**Solution:** 
-- Use a wired connection instead of WiFi
-- Try downloading during off-peak hours
-- Use a VPN if GitHub is throttled in your region
+### If Voice Model Download Fails
+Download manually from HuggingFace:
+- https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx
+- https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json
 
-### Issue: Antivirus Blocking
-**Solution:**
-- Temporarily disable antivirus
-- Add exception for `C:\Tools\piper`
-- Add exception for the download scripts
+## Related Files
+- [`install-piper.bat`](install-piper.bat) - Windows batch installation script
+- [`install-piper.ps1`](install-piper.ps1) - Windows PowerShell installation script
+- [`install-piper.sh`](install-piper.sh) - Linux/Codespaces installation script
+- [`SETUP_GUIDE.md`](SETUP_GUIDE.md) - General setup instructions
+- [`RUNTIME_REQUIREMENTS.md`](RUNTIME_REQUIREMENTS.md) - Runtime dependencies
 
-## Getting Help
-
-If you continue to have issues:
-
-1. **Check the error message carefully** - it often contains the solution
-2. **Try the PowerShell script** - it has better error handling
-3. **Install manually** - follow Solution 3 above
-4. **Check GitHub Issues**: https://github.com/rhasspy/piper/issues
-5. **Use alternative TTS** - Windows TTS or online services
-
-## What Changed in the Fixed Scripts
-
-### install-piper.bat
-- ✅ Added download retry logic (3 attempts)
-- ✅ Added file size validation
-- ✅ Improved ZIP extraction method
-- ✅ Better error messages
-- ✅ Automatic cleanup of corrupted files
-
-### install-piper.ps1 (New)
-- ✅ PowerShell-native implementation
-- ✅ ZIP validation before extraction
-- ✅ Robust error handling
-- ✅ Progress indicators
-- ✅ Colored output for better readability
-- ✅ Automatic retry with exponential backoff
-
-## Quick Start
-
-**Recommended approach:**
-
-1. Open PowerShell as Administrator
-2. Navigate to your project directory:
-   ```powershell
-   cd C:\path\to\void-win-app-v1
-   ```
-3. Run the PowerShell script:
-   ```powershell
-   .\install-piper.ps1
-   ```
-4. Wait for installation to complete
-5. Update your `config.json` with the paths shown
-6. Test your application
-
-If PowerShell script fails, try the batch script:
-```batch
-install-piper.bat
-```
-
-If both fail, follow the manual installation steps in Solution 3.
-
-## Success Indicators
-
-You'll know the installation succeeded when:
-- ✅ `C:\Tools\piper\piper.exe` exists
-- ✅ `C:\Tools\piper\models\voice.onnx` exists
-- ✅ Running `piper.exe --version` shows version info
-- ✅ A test.wav file is created successfully
-
-## Next Steps After Installation
-
-1. ✅ Update `config.json` with Piper paths
-2. ✅ Test voice generation in your application
-3. ✅ (Optional) Download additional voice models from:
-   https://github.com/rhasspy/piper/blob/master/VOICES.md
-4. ✅ (Optional) Add Piper to your system PATH for easier access
-
----
-
-**Note:** The improved scripts automatically handle most common issues. If you still encounter problems, the manual installation method (Solution 3) is the most reliable fallback option.
+## Status
+✅ **FIXED** - All installation scripts now use the correct Piper version (2023.11.14-2)

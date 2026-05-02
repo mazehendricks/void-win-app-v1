@@ -10,7 +10,7 @@ echo "========================================="
 echo ""
 
 # Configuration
-PIPER_VERSION="v1.2.0"
+PIPER_VERSION="2023.11.14-2"
 PIPER_URL="https://github.com/rhasspy/piper/releases/download/${PIPER_VERSION}/piper_amd64.tar.gz"
 INSTALL_DIR="/usr/local/bin"
 MODELS_DIR="./models"

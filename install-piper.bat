@@ -10,7 +10,7 @@ echo =========================================
 echo.
 
 REM Configuration
-set PIPER_VERSION=v1.2.0
+set PIPER_VERSION=2023.11.14-2
 set PIPER_URL=https://github.com/rhasspy/piper/releases/download/%PIPER_VERSION%/piper_windows_amd64.zip
 set INSTALL_DIR=C:\Tools\piper
 set MODELS_DIR=%INSTALL_DIR%\models

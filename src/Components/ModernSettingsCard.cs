@@ -19,12 +19,12 @@ public class ModernSettingsCard : Panel
     private string _description = "";
     private bool _isExpanded = true;
     private bool _isHovered = false;
-    private Panel _headerPanel;
-    private Panel _contentPanel;
-    private Label _titleLabel;
-    private Label _descriptionLabel;
-    private Label _iconLabel;
-    private Button _expandButton;
+    private Panel _headerPanel = null!;
+    private Panel _contentPanel = null!;
+    private Label _titleLabel = null!;
+    private Label _descriptionLabel = null!;
+    private Label _iconLabel = null!;
+    private Button _expandButton = null!;
     
     public string Title
     {

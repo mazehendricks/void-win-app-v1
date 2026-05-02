@@ -9,20 +9,20 @@ using VoidVideoGenerator.Models;
 /// </summary>
 public class StatusDashboard : Panel
 {
-    private Panel _servicesPanel;
-    private Panel _resourcesPanel;
-    private Panel _activityPanel;
+    private Panel _servicesPanel = null!;
+    private Panel _resourcesPanel = null!;
+    private Panel _activityPanel = null!;
     private Dictionary<string, ServiceStatusIndicator> _serviceIndicators = new();
-    private ProgressBar _cpuBar;
-    private ProgressBar _ramBar;
-    private ProgressBar _gpuBar;
-    private ProgressBar _diskBar;
-    private Label _cpuLabel;
-    private Label _ramLabel;
-    private Label _gpuLabel;
-    private Label _diskLabel;
-    private ListBox _activityLog;
-    private System.Windows.Forms.Timer _updateTimer;
+    private ProgressBar _cpuBar = null!;
+    private ProgressBar _ramBar = null!;
+    private ProgressBar _gpuBar = null!;
+    private ProgressBar _diskBar = null!;
+    private Label _cpuLabel = null!;
+    private Label _ramLabel = null!;
+    private Label _gpuLabel = null!;
+    private Label _diskLabel = null!;
+    private ListBox _activityLog = null!;
+    private System.Windows.Forms.Timer _updateTimer = null!;
     
     public StatusDashboard()
     {

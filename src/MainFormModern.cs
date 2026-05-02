@@ -17,18 +17,18 @@ public partial class MainFormModern : Form
     private List<string> _visualImagePaths = new();
     
     // Modern UI Components
-    private ModernSidebar _sidebar;
-    private Panel _contentArea;
-    private DirectorsConsole _directorsConsole;
-    private StatusDashboard _statusDashboard;
-    private Panel _currentPage;
+    private ModernSidebar _sidebar = null!;
+    private Panel _contentArea = null!;
+    private DirectorsConsole _directorsConsole = null!;
+    private StatusDashboard _statusDashboard = null!;
+    private Panel _currentPage = null!;
     
     // Page panels
-    private Panel _generatePage;
-    private Panel _libraryPage;
-    private Panel _settingsPage;
-    private Panel _statusPage;
-    private Panel _debugPage;
+    private Panel _generatePage = null!;
+    private Panel _libraryPage = null!;
+    private Panel _settingsPage = null!;
+    private Panel _statusPage = null!;
+    private Panel _debugPage = null!;
     
     // Services
     private IScriptGeneratorService? _scriptGenerator;

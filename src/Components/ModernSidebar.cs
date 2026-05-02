@@ -17,7 +17,7 @@ public class ModernSidebar : Panel
     private bool _isCollapsed = false;
     private List<SidebarItem> _items = new();
     private SidebarItem? _activeItem;
-    private Panel _statusPanel;
+    private Panel _statusPanel = null!;
     private Dictionary<string, ServiceStatus> _serviceStatuses = new();
     
     public event EventHandler<string>? NavigationChanged;

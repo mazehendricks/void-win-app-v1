@@ -8,15 +8,15 @@ using VoidVideoGenerator.Models;
 /// </summary>
 public class DirectorsConsole : Panel
 {
-    private TabControl _modeTabControl;
-    private TextBox _simplePromptBox;
-    private Panel _advancedPanel;
-    private ComboBox _shotTypeCombo;
-    private ComboBox _lightingCombo;
-    private ComboBox _cameraMotionCombo;
-    private NumericUpDown _durationNumeric;
-    private TextBox _jsonPreviewBox;
-    private ComboBox _templateCombo;
+    private TabControl _modeTabControl = null!;
+    private TextBox _simplePromptBox = null!;
+    private Panel _advancedPanel = null!;
+    private ComboBox _shotTypeCombo = null!;
+    private ComboBox _lightingCombo = null!;
+    private ComboBox _cameraMotionCombo = null!;
+    private NumericUpDown _durationNumeric = null!;
+    private TextBox _jsonPreviewBox = null!;
+    private ComboBox _templateCombo = null!;
     
     public string Prompt => _simplePromptBox.Text;
     public string ShotType => _shotTypeCombo.SelectedItem?.ToString() ?? "medium";

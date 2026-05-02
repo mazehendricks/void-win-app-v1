@@ -1,3 +1,8 @@
+// This file is kept for reference but the entry point is now in Program.cs
+// IMPORTANT: This entire file is commented out to avoid duplicate entry point errors
+// The active entry point is in Program.cs
+
+/*
 namespace VoidVideoGenerator;
 
 /// <summary>
@@ -29,3 +34,4 @@ static class ProgramModern
         Application.Run(new MainFormModern());
     }
 }
+*/

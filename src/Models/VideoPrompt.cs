@@ -6,9 +6,28 @@ namespace VoidVideoGenerator.Models;
 public class VideoPrompt
 {
     /// <summary>
+    /// Main text/description of what to generate (alias for Description)
+    /// </summary>
+    public string Text
+    {
+        get => Description;
+        set => Description = value;
+    }
+    
+    /// <summary>
     /// Main description of what to generate
     /// </summary>
     public string Description { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Shot type: "close-up", "medium", "wide", "extreme-close-up", "establishing"
+    /// </summary>
+    public string? ShotType { get; set; }
+    
+    /// <summary>
+    /// Lighting style: "natural", "dramatic", "soft", "hard", "golden-hour", "blue-hour"
+    /// </summary>
+    public string? Lighting { get; set; }
     
     /// <summary>
     /// Things to avoid in the generation

@@ -16,6 +16,7 @@ public static class ModernTheme
     // Background Colors (Slate)
     public static readonly Color Background = Color.FromArgb(15, 23, 42);     // Slate-900
     public static readonly Color Surface = Color.FromArgb(30, 41, 59);        // Slate-800
+    public static readonly Color SurfaceVariant = Color.FromArgb(24, 33, 50); // Slate-850 (between 900 and 800)
     public static readonly Color SurfaceHover = Color.FromArgb(51, 65, 85);   // Slate-700
     public static readonly Color SurfaceLight = Color.FromArgb(71, 85, 105);  // Slate-600
     
@@ -32,6 +33,7 @@ public static class ModernTheme
     public static readonly Color WarningLight = Color.FromArgb(251, 191, 36); // Amber-400
     public static readonly Color Error = Color.FromArgb(239, 68, 68);         // Red-500
     public static readonly Color ErrorLight = Color.FromArgb(248, 113, 113);  // Red-400
+    public static readonly Color Danger = Color.FromArgb(220, 38, 38);        // Red-600 (darker red for danger)
     public static readonly Color Info = Color.FromArgb(59, 130, 246);         // Blue-500
     public static readonly Color InfoLight = Color.FromArgb(96, 165, 250);    // Blue-400
     

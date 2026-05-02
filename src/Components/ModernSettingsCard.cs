@@ -11,7 +11,7 @@ public class ModernSettingsCard : Panel
 {
     private const int HeaderHeight = 60;
     private const int CollapsedHeight = 60;
-    private const int Padding = 20;
+    private const int ContentPaddingValue = 20;
     private const int BorderRadius = 8;
     
     private string _title = "";
@@ -113,7 +113,7 @@ public class ModernSettingsCard : Panel
         _iconLabel = new Label
         {
             Text = _icon,
-            Location = new Point(Padding, 15),
+            Location = new Point(ContentPaddingValue, 15),
             AutoSize = true,
             Font = new Font("Segoe UI Emoji", 20f),
             ForeColor = ModernTheme.Primary,
@@ -173,7 +173,7 @@ public class ModernSettingsCard : Panel
         {
             Dock = DockStyle.Fill,
             BackColor = Color.Transparent,
-            Padding = new Padding(Padding),
+            Padding = new Padding(ContentPaddingValue),
             AutoScroll = true
         };
         this.Controls.Add(_contentPanel);
@@ -297,7 +297,7 @@ public class ModernSettingsCard : Panel
                 contentHeight = bottom;
         }
         
-        return HeaderHeight + contentHeight + Padding * 2;
+        return HeaderHeight + contentHeight + ContentPaddingValue * 2;
     }
     
     public void AddControl(Control control)

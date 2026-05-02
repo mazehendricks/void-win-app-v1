@@ -8,14 +8,25 @@ A **100% local-only** faceless AI video generator for Windows. Create profession
 
 ## 🎯 Features
 
+### Core Features
 - **Local LLM Script Generation** - Uses Ollama (Llama 3.1, Mistral, etc.) for intelligent script writing
 - **Channel DNA System** - Define your unique voice, niche, and persona for authentic content
 - **Local Voice Synthesis** - Piper TTS for high-quality, natural-sounding narration
 - **Video Assembly** - FFmpeg-powered video creation with audio and visuals
 - **GPU Acceleration** - Hardware-accelerated video encoding (3-10x faster than CPU)
-- **Zero Cloud Costs** - Everything runs on your machine
-- **Privacy First** - No data sent to external services
+- **Zero Cloud Costs** - Everything runs on your machine (local mode)
+- **Privacy First** - No data sent to external services (local mode)
 - **2026 Compliance** - Built-in originality features to avoid platform penalties
+
+### 🎬 NEW: AI Video Generation
+- **4 Provider Options** - Runway ML, Luma AI, AnimateDiff (local), Hybrid (local)
+- **Cloud or Local** - Choose between cloud quality or free local generation
+- **Real AI Video Clips** - Generate actual video clips instead of image slideshows
+- **Customizable Motion** - Control motion intensity (0-10) for each video
+- **Multiple Styles** - Realistic, cinematic, animated, or artistic
+- **Seamless Integration** - Works with existing script generation pipeline
+
+👉 **[Quick Start Guide](AI_VIDEO_QUICK_START.md)** | **[Full Documentation](AI_VIDEO_GENERATION_COMPLETE.md)**
 
 ## 🖥️ System Requirements
 

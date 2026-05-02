@@ -1,17 +1,31 @@
 namespace VoidVideoGenerator;
 
+/// <summary>
+/// Entry point for VOID VIDEO GENERATOR with Modern UI
+/// </summary>
 static class Program
 {
     /// <summary>
-    ///  The main entry point for the application.
+    /// The main entry point for the application.
     /// </summary>
     [STAThread]
     static void Main()
     {
-        // To customize application configuration such as set high DPI settings or default font,
-        // see https://aka.ms/applicationconfiguration.
-        ApplicationConfiguration.Initialize();
+        // Enable visual styles for modern appearance
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault(false);
         
-        Application.Run(new MainForm());
+        // Set high DPI awareness for better scaling on modern displays
+        try
+        {
+            Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
+        }
+        catch
+        {
+            // Fallback for older .NET versions
+        }
+        
+        // Run the modern UI version
+        Application.Run(new MainFormModern());
     }
 }
